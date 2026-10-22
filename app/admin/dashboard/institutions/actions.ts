@@ -6,7 +6,8 @@ export type CreateInstitutionState = { ok: boolean; message: string };
 export async function createInstitution(_previous: CreateInstitutionState, form: FormData): Promise<CreateInstitutionState> {
   const name = String(form.get('name') ?? '').trim();
   const slug = String(form.get('slug') ?? '').trim().toLowerCase();
-  if (form.get('confirmed') !== 'yes') return { ok:false, message:'Please confirm institution creation before submitting.' };\n  if (name.length < 2 || name.length > 200) return { ok:false, message:'Institution name must be 2–200 characters.' };
+  if (form.get('confirmed') !== 'yes') return { ok:false, message:'Please confirm institution creation before submitting.' };
+  if (name.length < 2 || name.length > 200) return { ok:false, message:'Institution name must be 2–200 characters.' };
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || slug.length < 3 || slug.length > 60) return { ok:false, message:'Slug must be 3–60 lowercase letters, numbers or hyphen-separated words.' };
   try {
     const access = await getVerifiedPlatformOwner();
