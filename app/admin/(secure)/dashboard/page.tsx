@@ -1,15 +1,40 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getVerifiedPlatformOwner } from '../../../../lib/auth/platform-owner';
-export const dynamic='force-dynamic';
-export default async function SecureDashboard(){
- let access;try{access=await getVerifiedPlatformOwner()}catch{return <main className="main"><h1>Backend unavailable</h1><p className="muted">Administrator access is temporarily unavailable.</p></main>}
- if(!access)redirect('/login');
- const [institutions,organizations,events]=await Promise.all([
-  access.client.from('institutions').select('id',{count:'exact',head:true}),
-  access.client.from('organizations').select('id',{count:'exact',head:true}),
-  access.client.from('events').select('id',{count:'exact',head:true})
- ]);
- const metrics=[{label:'Institutions',value:institutions.error?'—':String(institutions.count??0),hint:'Connected campuses'},{label:'Organizations',value:organizations.error?'—':String(organizations.count??0),hint:'Scoped by access policies'},{label:'Events',value:events.error?'—':String(events.count??0),hint:'Across accessible colleges'}];
- return <div className="shell"><aside className="sidebar"><div className="brand">campus<span>OS.</span></div><nav className="nav" aria-label="Platform navigation"><Link className="active" href="/admin/dashboard">✦ Overview</Link><Link href="/admin/dashboard/institutions">▦ Institutions</Link><Link href="/admin">◇ Design preview</Link></nav><p className="muted" style={{padding:14,fontSize:12}}>PLATFORM OWNER<br/>Authenticated workspace</p></aside><main className="main"><header className="top"><div><div className="eyebrow">Platform / Command center</div><h1 className="heading">Your campus universe.</h1><p className="muted">One secure home for every institution.</p></div><span className="pill">✦ Live development data</span></header><section className="hero"><div><div className="eyebrow">Institution operations</div><h2>Build a connected campus ecosystem.</h2><p style={{color:'#c3b9df',maxWidth:520}}>Onboard institutions, organize teams and bring every campus moment together.</p></div><Link className="button" href="/admin/dashboard/institutions">Manage institutions ↗</Link></section><section className="grid" aria-label="Platform metrics">{metrics.map(m=><div className="card" key={m.label}><small>{m.label}</small><div className="metric">{m.value}</div><span className="muted">{m.hint}</span></div>)}<div className="card"><small>Workspace</small><div className="metric" style={{fontSize:23}}>Secure</div><span className="muted">Verified owner session</span></div></section><section className="section"><h2>Next actions</h2><div className="grid"><div className="card wide"><div className="eyebrow">01 / Institutions</div><h3>Welcome your next campus</h3><p className="muted">Create a tenant with explicit confirmation and an audit trail.</p><Link className="button" href="/admin/dashboard/institutions">Open directory →</Link></div><div className="card wide"><div className="eyebrow">02 / Coming soon</div><h3>Societies, events and certificates</h3><p className="muted">Modules will unlock after scoped authorization and workflows are implemented.</p></div></div></section></main></div>;
+import { signOut } from '../../dashboard/sign-out';
+
+export const dynamic = 'force-dynamic';
+
+export default async function SecureDashboard() {
+  let access;
+  try { access = await getVerifiedPlatformOwner(); }
+  catch { return <main className="console-fallback"><h1>Backend unavailable</h1><p>Administrator access is disabled until configuration is restored.</p><Link href="/">Return home</Link></main>; }
+  if (!access) redirect('/login');
+
+  const [{ count: institutionCount, error: countError }, { data: institutions, error: listError }] = await Promise.all([
+    access.client.from('institutions').select('id', { count: 'exact', head: true }),
+    access.client.from('institutions').select('id,name,slug,created_at').order('created_at', { ascending: false }).limit(5),
+  ]);
+
+  return <div className="console-shell">
+    <aside className="console-sidebar">
+      <Link href="/" className="console-logo">campus<span>OS.</span><span className="console-logo-dot">✦</span></Link>
+      <div className="console-nav-label">WORKSPACE</div>
+      <nav aria-label="Platform navigation" className="console-nav">
+        <Link href="/admin/dashboard" aria-current="page" className="selected"><span>◈</span> Overview</Link>
+        <Link href="/admin/dashboard/institutions"><span>▦</span> Institutions</Link>
+      </nav>
+      <div className="console-nav-label">COMING NEXT</div>
+      <div className="console-nav console-disabled" aria-label="Planned modules"><span>◉ &nbsp;Societies</span><span>✧ &nbsp;Festivals & events</span><span>◇ &nbsp;Automation studio</span><span>▤ &nbsp;Certificates</span></div>
+      <div className="console-sidebar-footer"><span className="console-avatar">{access.user.email?.slice(0,1).toUpperCase() || 'O'}</span><div><strong>Platform owner</strong><small title={access.user.email}>{access.user.email}</small></div></div>
+    </aside>
+    <main className="console-main">
+      <header className="console-header"><div><div className="eyebrow">PLATFORM / COMMAND CENTER</div><h1>Good to have you here<span className="console-sparkle"> ✦</span></h1><p className="muted">A clearer view of your campus universe, in one place.</p></div><form action={signOut}><button className="console-ghost" type="submit">Sign out ↗</button></form></header>
+      <section className="console-feature"><div className="console-feature-copy"><span className="console-feature-kicker">✦ &nbsp; CAMPUSOS CONTROL PLANE</span><h2>Every campus.<br/><em>One orbit.</em></h2><p>Build an extraordinary experience for every institution, society and student.</p><Link href="/admin/dashboard/institutions" className="console-feature-button">Explore institutions <span aria-hidden="true">↗</span></Link></div><div className="console-orbit" aria-hidden="true"><div className="orbit-ring ring-one"/><div className="orbit-ring ring-two"/><div className="orbit-ring ring-three"/><div className="orbit-core">C<span>✦</span></div><div className="orbit-point point-one"/><div className="orbit-point point-two"/><div className="orbit-point point-three"/></div></section>
+      <section className="console-metrics" aria-label="Live platform metrics"><div className="console-stat"><span>Institutions visible</span><strong>{countError?'—':institutionCount ?? 0}</strong><small>{countError?'Data temporarily unavailable':'Live · RLS-protected'}</small></div><div className="console-stat"><span>Current access</span><strong className="console-stat-label">Owner</strong><small>Verified server-side</small></div><div className="console-stat"><span>Institution data</span><strong className="console-stat-label">{listError?'Error':'Live'}</strong><small>Connected to Supabase</small></div></section>
+      <section className="console-section"><div className="console-section-heading"><div><div className="eyebrow">YOUR NETWORK</div><h2>Institutions</h2></div><Link href="/admin/dashboard/institutions" className="console-text-link">View directory ↗</Link></div>
+      <div className="console-list">{listError?<p role="alert" className="console-empty">Institution data could not be loaded. Please check permissions.</p>:!institutions?.length?<div className="console-empty"><strong>Your network starts here.</strong><p>No institutions have been added yet. Provisioning will be available after the onboarding workflow is audited.</p></div>:institutions.map((institution,i)=><div key={institution.id} className="console-institution"><div className="console-institution-mark">{institution.name.slice(0,1).toUpperCase()}</div><div className="console-institution-text"><strong>{institution.name}</strong><small>{institution.slug}</small></div><span className="console-index">0{i+1}</span></div>)}</div>
+      </section><footer className="console-footer">CampusOS · Development workspace · Sensitive actions require explicit authorization</footer>
+    </main>
+  </div>;
 }
