@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 import { notFound } from 'next/navigation';
+import EventRegistration from './event-registration';
 
 export const dynamic = 'force-dynamic';
 export default async function PublicEventPage({ params }: { params: Promise<{ id: string }> }) {
@@ -20,8 +21,9 @@ export default async function PublicEventPage({ params }: { params: Promise<{ id
       <h1 style={{fontSize:'clamp(2rem,6vw,3.6rem)',lineHeight:1.12}}>{event.title}</h1>
       <p style={{color:'#aab6d0'}}>Published event · CampusOS</p>
       <div style={{marginTop:32,padding:18,border:'1px solid #53617a',borderRadius:12}}>
-        Registration and QR check-in will be available in an upcoming release.
+        Register below to receive your unique QR ticket.
       </div>
+      <EventRegistration eventId={event.id} eventTitle={event.title}/>
     </article>
   </main>;
 }
