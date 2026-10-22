@@ -1,12 +1,15 @@
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getVerifiedPlatformOwner } from '../../../../lib/auth/platform-owner';
-import Link from 'next/link';
-
-export const dynamic = 'force-dynamic';
-export default async function SecureDashboard() {
-  let access;
-  try { access = await getVerifiedPlatformOwner(); } catch { return <main style={{padding:40}}>Backend not configured. Administrator access is unavailable.</main>; }
-  if (!access) redirect('/login');
-  const {count,error} = await access.client.from('institutions').select('id',{count:'exact',head:true});
-  return <main style={{padding:40}}><p>CampusOS · Platform Owner</p><h1>Institution control center</h1><p>Authenticated access granted.</p><p>Institutions: {error?'Unavailable':count ?? 0}</p><p>Institution onboarding is available to verified Platform Owners.</p><p><Link href="/admin/dashboard/institutions">Manage institutions →</Link></p></main>;
+export const dynamic='force-dynamic';
+export default async function SecureDashboard(){
+ let access;try{access=await getVerifiedPlatformOwner()}catch{return <main className="main"><h1>Backend unavailable</h1><p className="muted">Administrator access is temporarily unavailable.</p></main>}
+ if(!access)redirect('/login');
+ const [institutions,organizations,events]=await Promise.all([
+  access.client.from('institutions').select('id',{count:'exact',head:true}),
+  access.client.from('organizations').select('id',{count:'exact',head:true}),
+  access.client.from('events').select('id',{count:'exact',head:true})
+ ]);
+ const metrics=[{label:'Institutions',value:institutions.error?'—':String(institutions.count??0),hint:'Connected campuses'},{label:'Organizations',value:organizations.error?'—':String(organizations.count??0),hint:'Scoped by access policies'},{label:'Events',value:events.error?'—':String(events.count??0),hint:'Across accessible colleges'}];
+ return <div className="shell"><aside className="sidebar"><div className="brand">campus<span>OS.</span></div><nav className="nav" aria-label="Platform navigation"><Link className="active" href="/admin/dashboard">✦ Overview</Link><Link href="/admin/dashboard/institutions">▦ Institutions</Link><Link href="/admin">◇ Design preview</Link></nav><p className="muted" style={{padding:14,fontSize:12}}>PLATFORM OWNER<br/>Authenticated workspace</p></aside><main className="main"><header className="top"><div><div className="eyebrow">Platform / Command center</div><h1 className="heading">Your campus universe.</h1><p className="muted">One secure home for every institution.</p></div><span className="pill">✦ Live development data</span></header><section className="hero"><div><div className="eyebrow">Institution operations</div><h2>Build a connected campus ecosystem.</h2><p style={{color:'#c3b9df',maxWidth:520}}>Onboard institutions, organize teams and bring every campus moment together.</p></div><Link className="button" href="/admin/dashboard/institutions">Manage institutions ↗</Link></section><section className="grid" aria-label="Platform metrics">{metrics.map(m=><div className="card" key={m.label}><small>{m.label}</small><div className="metric">{m.value}</div><span className="muted">{m.hint}</span></div>)}<div className="card"><small>Workspace</small><div className="metric" style={{fontSize:23}}>Secure</div><span className="muted">Verified owner session</span></div></section><section className="section"><h2>Next actions</h2><div className="grid"><div className="card wide"><div className="eyebrow">01 / Institutions</div><h3>Welcome your next campus</h3><p className="muted">Create a tenant with explicit confirmation and an audit trail.</p><Link className="button" href="/admin/dashboard/institutions">Open directory →</Link></div><div className="card wide"><div className="eyebrow">02 / Coming soon</div><h3>Societies, events and certificates</h3><p className="muted">Modules will unlock after scoped authorization and workflows are implemented.</p></div></div></section></main></div>;
 }
