@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 
 /** Refresh auth cookies before server components read the session. Never authorize from middleware alone. */
 export async function middleware(request: NextRequest) {
@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
   const supabase = createServerClient(url, key, {
     cookies: {
       getAll() { return request.cookies.getAll(); },
-      setAll(cookies) {
+      setAll(cookies: { name: string; value: string; options?: CookieOptions }[]) {
         cookies.forEach(({ name, value }) => request.cookies.set(name, value));
         response = NextResponse.next({ request });
         cookies.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
