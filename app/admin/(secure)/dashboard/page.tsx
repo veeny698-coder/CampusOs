@@ -23,6 +23,7 @@ export default async function SecureDashboard() {
       <nav aria-label="Platform navigation" className="console-nav">
         <Link href="/admin/dashboard" aria-current="page" className="selected"><span>◈</span> Overview</Link>
         <Link href="/admin/dashboard/institutions"><span>▦</span> Institutions</Link>\n        <Link href="/admin/dashboard/audit"><span>☷</span> Audit trail</Link>\n        <Link href="/admin/dashboard/events"><span>✧</span> Events</Link>
+        <Link href="/admin/dashboard/security"><span>⚿</span> Security</Link>
       </nav>
       <div className="console-nav-label">COMING NEXT</div>
       <div className="console-nav console-disabled" aria-label="Planned modules"><span>◉ &nbsp;Societies</span><span>✧ &nbsp;Festival automation</span><span>◇ &nbsp;Automation studio</span><span>▤ &nbsp;Certificates</span></div>
