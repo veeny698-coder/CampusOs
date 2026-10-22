@@ -22,10 +22,10 @@ export default async function SecureDashboard() {
       <div className="console-nav-label">WORKSPACE</div>
       <nav aria-label="Platform navigation" className="console-nav">
         <Link href="/admin/dashboard" aria-current="page" className="selected"><span>◈</span> Overview</Link>
-        <Link href="/admin/dashboard/institutions"><span>▦</span> Institutions</Link>\n        <Link href="/admin/dashboard/audit"><span>☷</span> Audit trail</Link>
+        <Link href="/admin/dashboard/institutions"><span>▦</span> Institutions</Link>\n        <Link href="/admin/dashboard/audit"><span>☷</span> Audit trail</Link>\n        <Link href="/admin/dashboard/events"><span>✧</span> Events</Link>
       </nav>
       <div className="console-nav-label">COMING NEXT</div>
-      <div className="console-nav console-disabled" aria-label="Planned modules"><span>◉ &nbsp;Societies</span><span>✧ &nbsp;Festivals & events</span><span>◇ &nbsp;Automation studio</span><span>▤ &nbsp;Certificates</span></div>
+      <div className="console-nav console-disabled" aria-label="Planned modules"><span>◉ &nbsp;Societies</span><span>✧ &nbsp;Festival automation</span><span>◇ &nbsp;Automation studio</span><span>▤ &nbsp;Certificates</span></div>
       <div className="console-sidebar-footer"><span className="console-avatar">{access.user.email?.slice(0,1).toUpperCase() || 'O'}</span><div><strong>Platform owner</strong><small title={access.user.email}>{access.user.email}</small></div></div>
     </aside>
     <main className="console-main">
