@@ -1,3 +1,4 @@
 import type { ReactNode } from 'react';
+import './globals.css';
 export const metadata = { title: 'CampusOS', description: 'Campus operations platform' };
-export default function RootLayout({ children }: { children: ReactNode }) { return <html lang="en"><body style={{fontFamily:'system-ui',margin:0,background:'#0b1020',color:'#f8fafc'}}>{children}</body></html>; }
+export default function RootLayout({ children }: { children: ReactNode }) { return <html lang="en"><body>{children}</body></html>; }
