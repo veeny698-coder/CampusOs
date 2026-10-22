@@ -7,4 +7,4 @@
 - Privileged Data API grants (TRUNCATE, TRIGGER, REFERENCES, UPDATE, DELETE) are revoked for anon/authenticated.
 - No auto-membership assignment or subscription changes are implied by institution creation.
 - No public self-registration for institutions.
-- Pending: test with a real Platform Owner session, rate limiting, invite flows, audit export and transaction-level tenancy tests.
+- Owner-only SELECT policy permits audit review.\n- Pending: test with a real Platform Owner session, rate limiting, invite flows, audit export and transaction-level tenancy tests.
