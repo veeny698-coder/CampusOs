@@ -1,0 +1,40 @@
+name: Deploy CampusOS Preview
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  deploy-preview:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    environment: preview
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify preview deployment configuration
+        shell: bash
+        run: |
+          for variable in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY; do
+            if [[ -z "${!variable}" ]]; then
+              echo "::error::Missing preview configuration: ${variable}"
+              exit 1
+            fi
+          done
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      - name: Fetch project configuration
+        run: vercel pull --yes --environment=preview --token="$VERCEL_TOKEN"
+      - name: Build preview
+        run: vercel build --token="$VERCEL_TOKEN"
+      - name: Deploy preview
+        run: vercel deploy --prebuilt --token="$VERCEL_TOKEN"
