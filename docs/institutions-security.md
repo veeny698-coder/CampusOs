@@ -1,0 +1,3 @@
+# Institution directory security review
+
+This is read-only and gated by server-side getUser plus platform_owners lookup. The existing RLS policy on institutions only allows institution members to read rows, so a platform owner with no institution memberships will see an empty directory. This is intentional fail-closed behavior, **not** completed platform-wide visibility. A dedicated reviewed platform-owner SELECT policy or tightly audited server API must be added before platform-wide browsing can work. Never use service-role credentials in the browser. Do not grant blanket INSERT/UPDATE/DELETE to authenticated users. Pagination, invitations, audit logging, scoped grants and tenant-isolation tests are next.
