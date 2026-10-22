@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { getVerifiedPlatformOwner } from '../../../../lib/auth/platform-owner';
+import { getVerifiedPlatformOwner } from '../../../lib/auth/platform-owner';
 
 export const dynamic = 'force-dynamic';
 export default async function SecureDashboard() {
