@@ -7,7 +7,7 @@ function authClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) throw new Error('Authentication is not configured');
-  return createBrowserClient(url, key, { auth: { experimental: { passkey: true } } });
+  return createBrowserClient(url, key);
 }
 
 export default function Login() {
@@ -16,7 +16,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
-  const [mode, setMode] = useState<'password'|'magic'>('password');
+  const [mode, setMode] = useState<'password'|'magic'>('magic');
   useEffect(() => {
     const reason = new URLSearchParams(window.location.search).get('error');
     if (reason === 'auth-failed') setMessage('Email link verification failed. Open a fresh link in the same browser where you requested it.');
@@ -67,7 +67,7 @@ export default function Login() {
       {mode === 'password' && <><label htmlFor="password">Password</label><input id="password" type="password" minLength={8} required autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} style={{ display: 'block', width: '100%', padding: 14, margin: '12px 0 20px', borderRadius: 10, border: '1px solid #53617a', background: '#0d1424', color: 'white' }}/></>}
       <button disabled={busy} style={{ padding: 14, borderRadius: 10, width: '100%', background: '#a78bfa', color: '#101021', fontWeight: 700 }}>{busy ? 'Please wait…' : mode === 'password' ? 'Sign in with password' : 'Send secure sign-in link'}</button>
       <button type="button" disabled={busy} onClick={passkeyLogin} style={{ padding: 14, marginTop: 12, borderRadius: 10, width: '100%', border: '1px solid #6d7899', background: '#202944', color: 'white', fontWeight: 600 }}>Sign in with passkey</button>
-      <p style={{ color: '#aab6d0', fontSize: 13 }}>First time? Use Email link, then set a password or register a passkey in Security settings.</p>
+      <p style={{ color: '#aab6d0', fontSize: 13 }}>Use Email link to sign in. Password sign-in works only after you have set a password in Security settings.</p>
       <p role="status" aria-live="polite">{message}</p>
     </form>
   </main>;
