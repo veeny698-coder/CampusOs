@@ -1,8 +1,13 @@
 'use client';
 import { useActionState } from 'react';
-import { createInstitution,type CreateInstitutionState } from './actions';
-const initial:CreateInstitutionState={ok:false,message:''};
-export default function CreateInstitutionForm(){
- const [state,action,pending]=useActionState(createInstitution,initial);
- return <form action={action} className="card" style={{display:'grid',gap:16,marginTop:24}}><div><div className="eyebrow">Onboard a campus</div><h2 style={{marginBottom:4}}>Create institution</h2><p className="muted">A new tenant is created only after explicit confirmation. No owner membership is assigned automatically.</p></div><label style={{display:'grid',gap:7}}>Institution name<input name="name" minLength={2} maxLength={200} required placeholder="Example University" style={{padding:14,borderRadius:12,background:'#0b1020',border:'1px solid #475273',color:'white'}}/></label><label style={{display:'grid',gap:7}}>Unique slug<input name="slug" minLength={3} maxLength={63} required pattern="[a-zA-Z0-9][a-zA-Z0-9-]{2,62}" placeholder="example-university" style={{padding:14,borderRadius:12,background:'#0b1020',border:'1px solid #475273',color:'white'}}/></label><label style={{display:'flex',alignItems:'start',gap:10}}><input type="checkbox" name="confirmed" value="yes" required/>I confirm that I want to create this institution.</label><button type="submit" className="button" disabled={pending} style={{border:0,cursor:'pointer',justifySelf:'start'}}>{pending?'Creating…':'Create institution →'}</button>{state.message&&<p role="status" style={{color:state.ok?'#86efac':'#fca5a5'}}>{state.message}</p>}</form>
+import { createInstitution, type CreateInstitutionState } from './actions';
+const initial: CreateInstitutionState = {ok:false,message:''};
+export default function CreateInstitutionForm() {
+  const [state, action, pending] = useActionState(createInstitution, initial);
+  return <form action={action} className="console-create-form">
+    <div className="eyebrow">PLATFORM OWNER ONLY</div><h2>Bring a campus onboard.</h2>
+    <p className="muted">Create an institution workspace. Memberships and billing are configured separately.</p>
+    <div className="console-form-grid"><label>Institution name<input required minLength={2} maxLength={200} name="name" placeholder="e.g. North Valley University" autoComplete="organization"/></label><label>Unique slug<input required minLength={3} maxLength={60} name="slug" placeholder="north-valley-university" pattern="[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*"/></label></div>
+    <label className="console-confirm"><input type="checkbox" name="confirmed" value="yes" required/> I confirm I want to create this institution workspace.</label><div className="console-form-bottom"><button type="submit" disabled={pending} className="console-feature-button">{pending?'Creating…':'Create institution ↗'}</button><span role="status" aria-live="polite" className={state.ok?'console-form-success':'console-form-message'}>{state.message}</span></div>
+  </form>;
 }
