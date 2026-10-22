@@ -42,16 +42,6 @@ export default function Login() {
     } finally { setBusy(false); }
   }
 
-  async function passkeyLogin() {
-    setBusy(true); setMessage('');
-    try {
-      const { error } = await authClient().auth.signInWithPasskey();
-      if (error) throw error;
-      router.replace('/admin/dashboard'); router.refresh();
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Passkey sign-in failed');
-    } finally { setBusy(false); }
-  }
 
   return <main style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: 20 }}>
     <form onSubmit={submit} style={{ width: '100%', maxWidth: 440, background: '#151b2f', padding: 36, border: '1px solid #34365b', borderRadius: 24 }}>
@@ -66,7 +56,6 @@ export default function Login() {
       <input id="email" type="email" required autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} style={{ display: 'block', width: '100%', padding: 14, margin: '12px 0 20px', borderRadius: 10, border: '1px solid #53617a', background: '#0d1424', color: 'white' }} />
       {mode === 'password' && <><label htmlFor="password">Password</label><input id="password" type="password" minLength={8} required autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} style={{ display: 'block', width: '100%', padding: 14, margin: '12px 0 20px', borderRadius: 10, border: '1px solid #53617a', background: '#0d1424', color: 'white' }}/></>}
       <button disabled={busy} style={{ padding: 14, borderRadius: 10, width: '100%', background: '#a78bfa', color: '#101021', fontWeight: 700 }}>{busy ? 'Please wait…' : mode === 'password' ? 'Sign in with password' : 'Send secure sign-in link'}</button>
-      <button type="button" disabled={busy} onClick={passkeyLogin} style={{ padding: 14, marginTop: 12, borderRadius: 10, width: '100%', border: '1px solid #6d7899', background: '#202944', color: 'white', fontWeight: 600 }}>Sign in with passkey</button>
       <p style={{ color: '#aab6d0', fontSize: 13 }}>Use Email link to sign in. Password sign-in works only after you have set a password in Security settings.</p>
       <p role="status" aria-live="polite">{message}</p>
     </form>
