@@ -1,14 +1,23 @@
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
-export async function middleware(request:NextRequest){
- const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
- if(!url||!key)return NextResponse.next();
- let response=NextResponse.next({request});
- const client=createServerClient(url,key,{cookies:{
-  getAll(){return request.cookies.getAll()},
-  setAll(items){items.forEach(({name,value})=>request.cookies.set(name,value));response=NextResponse.next({request});items.forEach(({name,value,options})=>response.cookies.set(name,value,options))}
- }});
- await client.auth.getUser();
- return response;
+
+/** Refresh auth cookies before server components read the session. Never authorize from middleware alone. */
+export async function middleware(request: NextRequest) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) return NextResponse.next({ request });
+  let response = NextResponse.next({ request });
+  const supabase = createServerClient(url, key, {
+    cookies: {
+      getAll() { return request.cookies.getAll(); },
+      setAll(cookies) {
+        cookies.forEach(({ name, value }) => request.cookies.set(name, value));
+        response = NextResponse.next({ request });
+        cookies.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+      },
+    },
+  });
+  await supabase.auth.getUser();
+  return response;
 }
-export const config={matcher:['/admin/dashboard/:path*','/auth/callback','/login']};
+export const config = { matcher: ['/admin/dashboard/:path*', '/auth/callback'] };
