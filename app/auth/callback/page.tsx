@@ -32,8 +32,12 @@ export default function AuthCallback() {
           });
           if (error) throw error;
         } else if (code) {
-          const { error } = await client.auth.exchangeCodeForSession(code);
-          if (error) throw error;
+          // Supabase may already exchange the code during client initialization.
+          const { data: { session } } = await client.auth.getSession();
+          if (!session) {
+            const { error } = await client.auth.exchangeCodeForSession(code);
+            if (error) throw error;
+          }
         } else if (tokenHash && (type === 'email' || type === 'magiclink' || type === 'recovery' || type === 'signup')) {
           const { error } = await client.auth.verifyOtp({ token_hash: tokenHash, type: type as 'email' | 'magiclink' | 'recovery' | 'signup' });
           if (error) throw error;
