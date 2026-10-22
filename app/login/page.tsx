@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 
@@ -17,6 +17,12 @@ export default function Login() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const [mode, setMode] = useState<'password'|'magic'>('password');
+  useEffect(() => {
+    const reason = new URLSearchParams(window.location.search).get('error');
+    if (reason === 'auth-failed') setMessage('Email link verification failed. Open a fresh link in the same browser where you requested it.');
+    else if (reason === 'invalid-link') setMessage('This sign-in link is invalid or expired. Request a fresh email link.');
+    else if (reason === 'config') setMessage('Authentication service configuration is unavailable.');
+  }, []);
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); setBusy(true); setMessage('');
@@ -29,7 +35,7 @@ export default function Login() {
       } else {
         const { error } = await client.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin + '/auth/callback' } });
         if (error) throw error;
-        setMessage('Check your email for a fresh sign-in link.');
+        setMessage('Check your email. Open the new link in the SAME browser on this device; do not switch to an in-app Gmail browser.');
       }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Unable to sign in');
