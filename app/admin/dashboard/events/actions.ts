@@ -18,3 +18,16 @@ export async function createEventDraft(_previous: CreateEventState, form: FormDa
     return {ok:true,message:'Draft event created successfully and logged.'};
   } catch {return {ok:false,message:'Event service unavailable. Try again later.'};}
 }
+
+export async function setEventPublication(form: FormData): Promise<void> {
+  const id = String(form.get('event_id') ?? '');
+  const action = String(form.get('action') ?? '');
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) return;
+  if (action !== 'publish' && action !== 'unpublish') return;
+  const access = await getVerifiedPlatformOwner();
+  if (!access) return;
+  const { error } = await access.client.rpc('set_event_publication', { p_event_id: id, p_publish: action === 'publish' });
+  if (error) throw new Error('Unable to update event publication status.');
+  revalidatePath('/admin/dashboard/events');
+  revalidatePath('/events/' + id);
+}
