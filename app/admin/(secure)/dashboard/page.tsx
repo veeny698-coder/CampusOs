@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { getVerifiedPlatformOwner } from '../../../lib/auth/platform-owner';
+import { getVerifiedPlatformOwner } from '../../../../lib/auth/platform-owner';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
