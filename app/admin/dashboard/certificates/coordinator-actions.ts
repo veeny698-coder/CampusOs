@@ -8,7 +8,7 @@ export async function addCoordinator(_state:{message:string;code?:string},form:F
  try{
   const access=await getVerifiedPlatformOwner();
   if(!access)return {message:'Super Admin access required.'};
-  const {data,error}=await access.client.rpc('add_certificate_coordinator',{p_event:event,p_name:name,p_fields:{}});
+  const {data,error}=await access.client.rpc('add_certificate_coordinator',{p_event:event,p_name:name,p_fields:Object.fromEntries(['role','department','designation'].map(key=>[key,String(form.get(key)||'').trim().slice(0,120)]).filter(([,value])=>Boolean(value)))});
   if(error)return {message:'Unable to add coordinator. Please check event permissions.'};
   revalidatePath('/admin/dashboard/certificates');
   return {message:'Coordinator certificate ready.',code:String(data)};
