@@ -5,11 +5,12 @@ type Template={event_id:string;title:string;subtitle:string;footer:string;primar
 const defaults={title:'Certificate of Participation',subtitle:'is proudly presented to',footer:'Issued by CampusOS',primary_color:'#a78bfa',background_color:'#151b2f',text_color:'#ffffff',name_y:49,qr_x:86,qr_y:78,layout:'classic'};
 export default function TemplateEditor({events,templates}:{events:{id:string;title:string}[];templates:Template[]}){
  const [event,setEvent]=useState(events[0]?.id||'');
+ const [exportPage,setExportPage]=useState(1);
  const [draft,setDraft]=useState({...defaults,...templates.find(t=>t.event_id===event)});
  const [saved,saveAction,saving]=useActionState(saveTemplate,{ok:false,message:''});
  const [bulk,bulkAction,issuing]=useActionState(bulkIssue,{ok:false,message:''});
  const modify=(key:keyof typeof defaults,value:string|number)=>setDraft(previous=>({...previous,[key]:value}));
- function selectEvent(id:string){setEvent(id);setDraft({...defaults,...templates.find(t=>t.event_id===id)});}
+ function selectEvent(id:string){setEvent(id);setExportPage(1);setDraft({...defaults,...templates.find(t=>t.event_id===id)});}
  return <section style={{marginTop:30,display:'grid',gap:22}}>
   <div style={{padding:24,borderRadius:20,border:'1px solid #34365b',background:'#151b2f'}}>
    <h2>Certificate template studio</h2>
@@ -44,7 +45,7 @@ export default function TemplateEditor({events,templates}:{events:{id:string;tit
    <label>Certificate type <select name="certificate_type" style={{padding:10,marginLeft:12}}><option value="participation">Participation</option><option value="appreciation">Appreciation</option></select></label>
    <button type="submit" disabled={!event||issuing} style={{padding:12,background:'#a78bfa',color:'#101021',borderRadius:10,fontWeight:700}}>{issuing?'Issuing…':'Issue certificates to all registered participants'}</button>
    <p role="status">{bulk.message}</p>
-   {event&&<a style={{color:'#b9a5ff'}} href={'/admin/dashboard/certificates/export?event='+encodeURIComponent(event)}>Download event certificates (ZIP) ↗</a>}
+   {event&&<div style={{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}}><label>Export batch (50 PNGs per ZIP) <input type="number" min={1} max={101} value={exportPage} onChange={e=>setExportPage(Math.max(1,Math.min(101,Number(e.target.value)||1)))} style={{width:75,padding:8,marginLeft:10}}/></label><a style={{color:'#b9a5ff'}} href={'/admin/dashboard/certificates/export?event='+encodeURIComponent(event)+'&page='+(exportPage-1)}>Download batch {exportPage} (ZIP) ↗</a></div>}
   </form>
  </section>;
 }
