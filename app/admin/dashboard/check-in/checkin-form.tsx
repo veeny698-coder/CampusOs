@@ -26,7 +26,7 @@ export default function CheckinForm({initialToken}:{initialToken:string}){
  const stopping=useRef(false);
  const alive=useRef(true);
  const found=useRef(false);
- useEffect(()=>{alive.current=true;return()=>{alive.current=false;const instance=scanner.current;scanner.current=null;if(instance){void instance.stop().catch(()=>{}).then(()=>instance.clear().catch(()=>{}));}};},[]);
+ useEffect(()=>{alive.current=true;return()=>{alive.current=false;const instance=scanner.current;scanner.current=null;if(instance){void instance.stop().catch(()=>{}).then(()=>Promise.resolve(instance.clear()).catch(()=>{}));}};},[]);
  async function stopCamera(){
   if(stopping.current)return;
   stopping.current=true;
