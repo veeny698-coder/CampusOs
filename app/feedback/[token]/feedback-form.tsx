@@ -5,6 +5,7 @@ export default function FeedbackForm({token,alreadySubmitted}:{token:string;alre
  const [rating,setRating]=useState('');
  const [feedback,setFeedback]=useState('');
  const [busy,setBusy]=useState(false);
+ const [certificate,setCertificate]=useState('');
  const [message,setMessage]=useState(alreadySubmitted?'Feedback previously submitted. You can update it here.':'');
  async function send(e:React.FormEvent<HTMLFormElement>){
   e.preventDefault();setBusy(true);setMessage('');
@@ -14,7 +15,10 @@ export default function FeedbackForm({token,alreadySubmitted}:{token:string;alre
    const client=createBrowserClient(url,key);
    const {error}=await client.rpc('submit_certificate_feedback',{p_ticket:token,p_answers:{rating,feedback}});
    if(error)throw Error('Unable to save feedback. Please verify your ticket and try again.');
-   setMessage('Thank you! Your feedback is recorded. Your event organizer can now issue your certificate.');
+   const {data:code,error:claimError}=await client.rpc('claim_certificate_after_feedback',{p_ticket:token});
+   if(claimError||!code){setMessage('Feedback saved. Certificate is temporarily unavailable; use Claim certificate below to retry.');return;}
+   setCertificate(String(code));
+   setMessage('Feedback submitted successfully! Your certificate is ready.');
   }catch(error){setMessage(error instanceof Error?error.message:'Unable to submit feedback.');}
   finally{setBusy(false);}
  }
@@ -29,5 +33,18 @@ export default function FeedbackForm({token,alreadySubmitted}:{token:string;alre
   </label>
   <button type="submit" disabled={busy} style={{background:'#a78bfa',color:'#151b2f',padding:14,borderRadius:10,fontWeight:700}}>{busy?'Submitting…':'Submit feedback'}</button>
   <p role="status" aria-live="polite">{message}</p>
+  {certificate&&<a href={'/verify/certificate/'+certificate} style={{color:'#b9a5ff',fontWeight:700}}>Open and download my certificate ↗</a>}
+  {alreadySubmitted&&!certificate&&<button type="button" disabled={busy} onClick={async()=>{
+    setBusy(true);setMessage('');
+    try{
+      const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      if(!url||!key)throw Error('Service unavailable');
+      const client=createBrowserClient(url,key);
+      const {data,error}=await client.rpc('claim_certificate_after_feedback',{p_ticket:token});
+      if(error||!data)throw Error('Could not retrieve certificate');
+      setCertificate(String(data));setMessage('Certificate found.');
+    }catch{setMessage('Could not retrieve certificate. Try again later.');}
+    finally{setBusy(false);}
+  }} style={{padding:12,borderRadius:10}}>Claim existing certificate</button>}
  </form>;
 }
