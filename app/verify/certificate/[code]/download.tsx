@@ -26,15 +26,22 @@ export default function DownloadCertificate({info}:{info:CertificateData}){
  }
  async function render(){
   const el=canvas.current;if(!el)throw Error('Certificate canvas not available');
-  const ctx=el.getContext('2d');if(!ctx)throw Error('Canvas not supported');
-  el.width=1400;el.height=990;
-  ctx.fillStyle=info.background||'#151b2f';ctx.fillRect(0,0,1400,990);
   const url=process.env.NEXT_PUBLIC_SUPABASE_URL;
+  let background:HTMLImageElement|null=null;
   if(info.imagePath){
    if(!url)throw Error('Artwork service not configured');
    const src=url+'/storage/v1/object/public/certifrenzy-templates/'+info.imagePath.split('/').map(encodeURIComponent).join('/');
-   const background=await imageFrom(src);
-   ctx.drawImage(background,0,0,1400,990);
+   background=await imageFrom(src);
+   if(background.naturalWidth<300||background.naturalHeight<300||
+      background.naturalWidth*background.naturalHeight>20000000)
+    throw Error('Artwork must be at least 300 px per side and at most 20 megapixels');
+  }
+  el.width=background?.naturalWidth||1400;el.height=background?.naturalHeight||990;
+  const width=el.width,height=el.height;
+  const ctx=el.getContext('2d');if(!ctx)throw Error('Canvas not supported');
+  ctx.fillStyle=info.background||'#151b2f';ctx.fillRect(0,0,width,height);
+  if(background){
+   ctx.drawImage(background,0,0,width,height);
   }else{
    ctx.strokeStyle=info.primary||'#a78bfa';ctx.lineWidth=10;ctx.strokeRect(35,35,1330,920);
    ctx.lineWidth=2;ctx.strokeRect(55,55,1290,880);
@@ -53,18 +60,19 @@ export default function DownloadCertificate({info}:{info:CertificateData}){
   const fields=info.placeholders?.length?info.placeholders:defaultFields;
   for(const field of fields){
    if(!Object.prototype.hasOwnProperty.call(values,field.key))continue;
-   const x=Math.max(0,Math.min(100,Number(field.x)))*14;
-   const y=Math.max(0,Math.min(100,Number(field.y)))*9.9;
+   const x=Math.max(0,Math.min(100,Number(field.x)))*width/100;
+   const y=Math.max(0,Math.min(100,Number(field.y)))*height/100;
    const size=Math.max(10,Math.min(130,Number(field.fontSize)));
    ctx.font='bold '+size+'px Georgia,serif';
-   ctx.fillText(String(values[field.key]||''),x,y,Math.max(40,Math.min(1200,1400-2*Math.abs(x-700)-35)));
+   ctx.fillText(String(values[field.key]||''),x,y,Math.max(40,Math.min(width*0.85,width-2*Math.abs(x-width/2)-20)));
   }
   const qr=await QRCode.toDataURL(window.location.origin+(info.verificationPath||'/verify/certificate/'+info.code),{width:220,margin:1});
   const image=await imageFrom(qr);
-  const qx=Math.max(7,Math.min(93,info.qrX??86))*14;
-  const qy=Math.max(9,Math.min(91,info.qrY??78))*9.9;
-  ctx.fillStyle='#ffffff';ctx.fillRect(qx-100,qy-100,200,200);
-  ctx.drawImage(image,qx-93,qy-93,186,186);
+  const qrSize=Math.max(80,Math.min(200,Math.min(width,height)*0.20));
+  const qx=Math.max(qrSize/2+8,Math.min(width-qrSize/2-8,Math.max(0,Math.min(100,info.qrX??86))*width/100));
+  const qy=Math.max(qrSize/2+8,Math.min(height-qrSize/2-8,Math.max(0,Math.min(100,info.qrY??78))*height/100));
+  ctx.fillStyle='#ffffff';ctx.fillRect(qx-qrSize/2,qy-qrSize/2,qrSize,qrSize);
+  ctx.drawImage(image,qx-qrSize/2+7,qy-qrSize/2+7,qrSize-14,qrSize-14);
   return el;
  }
  useEffect(()=>{let active=true;void render().then(()=>{if(active)setPreviewReady(true);}).catch(err=>{if(active)setMessage(err instanceof Error?err.message:'Preview unavailable');});return ()=>{active=false;};},[]);
@@ -88,7 +96,7 @@ export default function DownloadCertificate({info}:{info:CertificateData}){
    const win=window.open('','_blank');
    if(!win)throw Error('Allow pop-ups to use Save as PDF');
    const doc=win.document;doc.title='Certificate '+info.code;
-   const style=doc.createElement('style');style.textContent='@page{size:landscape;margin:0}html,body{margin:0}img{display:block;max-width:100vw;max-height:100vh;margin:auto}';
+   const style=doc.createElement('style');style.textContent='@page{size:'+(el.width>=el.height?'landscape':'portrait')+';margin:0}html,body{margin:0}img{display:block;max-width:100vw;max-height:100vh;margin:auto}';
    doc.head.appendChild(style);
    const img=doc.createElement('img');img.src=data;img.alt='Certificate';
    doc.body.appendChild(img);
@@ -97,7 +105,7 @@ export default function DownloadCertificate({info}:{info:CertificateData}){
   }catch(error){setMessage(error instanceof Error?error.message:'PDF export failed');}finally{setBusy(false);}
  }
  return <section style={{display:'grid',justifyItems:'center',gap:12,marginTop:26}}>
-  <canvas ref={canvas} width={1400} height={990} aria-label="Certificate artwork preview" style={{display:"block",width:"100%",maxWidth:860,aspectRatio:"1400/990",opacity:previewReady?1:0.3,borderRadius:8}}/>
+  <canvas ref={canvas} width={1400} height={990} aria-label="Certificate artwork preview" style={{display:"block",width:"100%",maxWidth:860,opacity:previewReady?1:0.3,borderRadius:8}}/>
   {info.status==='valid'?<div style={{display:'flex',gap:12,flexWrap:'wrap',justifyContent:'center'}}>
    <button disabled={busy} onClick={png} style={{padding:12,borderRadius:8,background:'#a78bfa',color:'#151b2f'}}>Download PNG</button>
    <button disabled={busy} onClick={pdf} style={{padding:12,borderRadius:8,background:'#a78bfa',color:'#151b2f'}}>Save as PDF</button>
