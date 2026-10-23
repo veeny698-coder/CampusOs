@@ -33,6 +33,7 @@ export default function EventRegistration({ eventId, eventTitle }: { eventId: st
     <p style={{overflowWrap:'anywhere',fontSize:12}}>Ticket ID: {ticket}</p>
     {qr&&<a href={qr} download={'campusos-ticket-'+eventId+'.png'} style={{color:'#b9a5ff'}}>Download QR ticket ↓</a>}
     <p style={{color:'#aab6d0'}}>Show this ticket at event check-in. Do not share it publicly.</p>
+    <p><a href={'/feedback/'+ticket} style={{color:'#b9a5ff',fontWeight:700}}>Submit event feedback for your certificate ↗</a></p>
   </section>;
   return <form onSubmit={submit} style={{display:'grid',gap:12,marginTop:30}}>
     <h2>Register for {eventTitle}</h2>
