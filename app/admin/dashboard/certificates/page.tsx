@@ -6,6 +6,7 @@ import TemplateEditor from './template-editor';
 import CoordinatorForm from './coordinator-form';
 import ArtworkUploader from './artwork-uploader';
 import PlaceholderEditor from './placeholder-editor';
+import FeedbackEditor from './feedback-editor';
 export const dynamic='force-dynamic';
 export default async function CertificatesPage(){
  const access=await getVerifiedPlatformOwner();
@@ -22,7 +23,7 @@ export default async function CertificatesPage(){
   <h1 className="heading">Every achievement counts. ✦</h1>
   <p className="muted">Issue authentic, uniquely verifiable certificates for event participants.</p>
   {error||events.error?<p role="alert">Unable to load event registrations.</p>:<IssueForm registrations={(registrations??[]).map(r=>({...r,event_title:titles.get(r.event_id)||'Event'}))}/>}
-  {eventError||templateError?<p role="alert">Unable to load certificate studio settings.</p>:<><TemplateEditor events={allEvents??[]} templates={templates??[]}/><ArtworkUploader events={allEvents??[]} templates={templates??[]}/><PlaceholderEditor events={allEvents??[]} templates={templates??[]}/><CoordinatorForm events={allEvents??[]}/></>}
+  {eventError||templateError?<p role="alert">Unable to load certificate studio settings.</p>:<><TemplateEditor events={allEvents??[]} templates={templates??[]}/><ArtworkUploader events={allEvents??[]} templates={templates??[]}/><PlaceholderEditor events={allEvents??[]} templates={templates??[]}/><FeedbackEditor events={allEvents??[]} templates={templates??[]}/><CoordinatorForm events={allEvents??[]}/></>}
   {(allEvents??[]).length>0&&<section style={{marginTop:24}}><h2>Coordinator download links</h2>{(allEvents??[]).map(e=><p key={e.id}><Link href={'/events/'+e.id+'/coordinators'} target="_blank">{e.title} — Coordinator certificate link ↗</Link></p>)}</section>}
   <section className="console-section" style={{marginTop:32}}><div className="console-section-heading"><h2>Recently issued</h2><span className="console-directory-count">Latest 50</span></div>
    <div className="console-list">{issuedError?<p role="alert">Certificate records unavailable.</p>:!issued?.length?<p className="console-empty">No certificates issued yet.</p>:issued.map(c=><div className="console-institution" key={c.id}><div className="console-institution-text"><strong>{c.recipient_name}</strong><small>{c.certificate_type} · {new Date(c.issued_at).toLocaleDateString('en-IN')}</small></div><Link className="console-text-link" href={'/verify/certificate/'+c.certificate_code} target="_blank">Verify ↗</Link></div>)}</div>
