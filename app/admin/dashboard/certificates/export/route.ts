@@ -9,7 +9,7 @@ export const runtime='nodejs';
 
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const PAGE_SIZE=50;
-type Field={key:string;x:number;y:number;fontSize:number};
+type Field={key:string;x:number;y:number;fontSize:number;color?:string;family?:string;align?:string};
 
 function escapeXml(text:string){
  return text.replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&apos;'}[c]||c));
@@ -25,7 +25,8 @@ function fieldsFrom(value:unknown):Field[]{
  return value.filter(f=>f&&typeof f.key==='string').slice(0,24).map(f=>({
   key:f.key,x:Math.max(0,Math.min(100,Number(f.x)||0)),
   y:Math.max(0,Math.min(100,Number(f.y)||0)),
-  fontSize:Math.max(10,Math.min(130,Number(f.fontSize)||20))
+  fontSize:Math.max(10,Math.min(130,Number(f.fontSize)||20)),
+  color:f.color,family:f.family,align:f.align
  }));
 }
 export async function GET(request:Request){
@@ -83,7 +84,10 @@ export async function GET(request:Request){
   const texts=fields.map(field=>{
    if(!Object.prototype.hasOwnProperty.call(values,field.key))return '';
    const x=field.x*artWidth/100,y=field.y*artHeight/100;
-   return '<text x="'+x+'" y="'+y+'" font-size="'+field.fontSize+'" fill="'+foreground+'" text-anchor="middle" font-family="Georgia,serif" font-weight="bold">'+escapeXml(values[field.key])+'</text>';
+   const color=safeColor(field.color,foreground);
+   const family=field.family==='sans'?'Arial,sans-serif':field.family==='mono'?'monospace':'Georgia,serif';
+   const align=field.align==='left'?'start':field.align==='right'?'end':'middle';
+   return '<text x="'+x+'" y="'+y+'" font-size="'+field.fontSize+'" fill="'+color+'" text-anchor="'+align+'" font-family="'+family+'" font-weight="bold">'+escapeXml(values[field.key])+'</text>';
   }).join('');
   const heading=backgroundImage?'':[
     '<rect x="40" y="40" width="1320" height="910" fill="none" stroke="'+primary+'" stroke-width="9"/>',
