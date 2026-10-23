@@ -15,6 +15,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "qrcode": "^1.5.4",
+    "jszip": "3.10.1",
+    "sharp": "0.34.3",
     "html5-qrcode": "^2.3.8"
   },
   "devDependencies": {
