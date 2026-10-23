@@ -2,7 +2,7 @@
 import {useState} from 'react';
 import {createBrowserClient} from '@supabase/ssr';
 type Event={id:string;title:string};
-type Question={id:string;label:string;type:'rating'|'text';required:boolean};
+type Question={id:string;label:string;type:'rating'|'text'|'certificate_text';required:boolean};
 type Saved={event_id:string;feedback_open?:boolean;feedback_questions?:Question[]};
 const defaults:Question[]=[
 {id:'rating',label:'How would you rate this event?',type:'rating',required:true},
@@ -47,7 +47,7 @@ export default function FeedbackEditor({events,templates}:{events:Event[];templa
    {questions.map((q,i)=><div key={i} style={{padding:14,border:'1px solid #34365b',borderRadius:12,display:'grid',gap:9}}>
     <label>Question key<input value={q.id} onChange={e=>edit(i,{id:e.target.value.toLowerCase()})} style={{display:'block',padding:10,width:'100%'}}/></label>
     <label>Question text<input value={q.label} maxLength={160} onChange={e=>edit(i,{label:e.target.value})} style={{display:'block',padding:10,width:'100%'}}/></label>
-    <label>Answer type<select value={q.type} onChange={e=>edit(i,{type:e.target.value as 'text'|'rating'})} style={{padding:10,marginLeft:9}}><option value="rating">Rating 1–5</option><option value="text">Text</option></select></label>
+    <label>Answer type<select value={q.type} onChange={e=>edit(i,{type:e.target.value as 'text'|'rating'|'certificate_text'})} style={{padding:10,marginLeft:9}}><option value="rating">Rating 1–5</option><option value="text">Private feedback text</option><option value="certificate_text">Public certificate field</option></select></label>
     <label><input type="checkbox" checked={q.required} onChange={e=>edit(i,{required:e.target.checked})}/> Required answer</label>
     <button type="button" onClick={()=>setQuestions(old=>old.filter((_,j)=>i!==j))} disabled={questions.length<=1}>Delete question</button>
    </div>)}
