@@ -1,7 +1,7 @@
 'use client';
 import {useState} from 'react';
 import {createBrowserClient} from '@supabase/ssr';
-type Question={id:string;label:string;type:'rating'|'text';required:boolean};
+type Question={id:string;label:string;type:'rating'|'text'|'certificate_text';required:boolean};
 export default function FeedbackForm({token,alreadySubmitted,questions,open}:{token:string;alreadySubmitted:boolean;questions:Question[];open:boolean}){
  const [answers,setAnswers]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
@@ -32,7 +32,7 @@ export default function FeedbackForm({token,alreadySubmitted,questions,open}:{to
  }
  return <section style={{display:'grid',gap:18}}>
  {open&&<form onSubmit={submit} style={{display:'grid',gap:16,marginTop:24}}>
-  {questions.map(q=><label key={q.id}>{q.label}{q.required?' *':''}
+  {questions.map(q=><label key={q.id}>{q.label}{q.required?' *':''}{q.type==='certificate_text'?' (will appear on your public certificate)':''}
    {q.type==='rating'?<select required={q.required} value={answers[q.id]||''} onChange={e=>setAnswers(a=>({...a,[q.id]:e.target.value}))} style={{display:'block',padding:13,marginTop:8,width:'100%'}}>
     <option value="">Select rating</option>{[1,2,3,4,5].map(i=><option key={i} value={String(i)}>{i} / 5</option>)}
    </select>:<textarea rows={4} maxLength={2000} required={q.required} value={answers[q.id]||''} onChange={e=>setAnswers(a=>({...a,[q.id]:e.target.value}))} style={{display:'block',padding:13,marginTop:8,width:'100%'}}/>}
