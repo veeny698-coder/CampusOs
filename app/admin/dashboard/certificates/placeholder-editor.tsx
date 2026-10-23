@@ -2,7 +2,7 @@
 import {useState} from 'react';
 import {createBrowserClient} from '@supabase/ssr';
 type Event={id:string;title:string};
-type Field={key:string;x:number;y:number;fontSize:number};
+type Field={key:string;x:number;y:number;fontSize:number;color?:string;family?:'serif'|'sans'|'mono';align?:'left'|'center'|'right'};
 type Template={event_id:string;participant_placeholders?:Field[]|null;coordinator_placeholders?:Field[]|null;image_path?:string|null;coordinator_image_path?:string|null};
 const initial:Field[]=[{key:'name',x:50,y:49,fontSize:78},{key:'event',x:50,y:64,fontSize:30},{key:'date',x:24,y:82,fontSize:21},{key:'certificate_id',x:48,y:94,fontSize:16}];
 export default function PlaceholderEditor({events,templates}:{events:Event[];templates:Template[]}){
@@ -20,8 +20,8 @@ export default function PlaceholderEditor({events,templates}:{events:Event[];tem
   const saved=coord?template?.coordinator_placeholders:template?.participant_placeholders;
   setFields(saved?.length?saved.map(f=>({...f})):initial.map(f=>({...f})));setMessage('');
  }
- function edit(index:number,key:'key'|'x'|'y'|'fontSize',value:string){
-  setFields(old=>old.map((f,i)=>i===index?{...f,[key]:key==='key'?value:Number(value)}:f));
+ function edit(index:number,key:'key'|'x'|'y'|'fontSize'|'color'|'family'|'align',value:string){
+  setFields(old=>old.map((f,i)=>i===index?{...f,[key]:['key','color','family','align'].includes(key)?value:Number(value)}:f));
  }
  async function save(){
   setBusy(true);setMessage('');
@@ -50,13 +50,18 @@ export default function PlaceholderEditor({events,templates}:{events:Event[];tem
     {(['x','y','fontSize'] as const).map(k=><label key={k}>{k==='fontSize'?'Font size':k.toUpperCase()+' position'}: {f[k]}{k==='fontSize'?'px':'%'}
       <input type="range" min={k==='fontSize'?10:0} max={k==='fontSize'?130:100} value={f[k]} onChange={e=>edit(i,k,e.target.value)} style={{display:'block',width:'100%'}}/>
     </label>)}
+    <div style={{display:'flex',gap:16,flexWrap:'wrap',alignItems:'center'}}>
+     <label>Text colour <input type="color" value={f.color||'#a78bfa'} onChange={e=>edit(i,'color',e.target.value)}/></label>
+     <label>Font <select value={f.family||'serif'} onChange={e=>edit(i,'family',e.target.value)}><option value="serif">Serif</option><option value="sans">Sans serif</option><option value="mono">Monospace</option></select></label>
+     <label>Align <select value={f.align||'center'} onChange={e=>edit(i,'align',e.target.value)}><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></label>
+    </div>
     <button type="button" onClick={()=>setFields(old=>old.filter((_,j)=>j!==i))} disabled={fields.length===1}>Remove field</button>
    </div>)}
   </div>
   <button type="button" disabled={fields.length>=24} onClick={()=>setFields(old=>[...old,{key:'custom_'+(old.length+1),x:50,y:50,fontSize:24}])}>+ Add placeholder</button>
   <div style={{position:'relative',margin:'18px 0',aspectRatio:'1400/990',background:'#151b2f',border:'3px solid #a78bfa',overflow:'hidden'}}>
    {imgSrc&&<img src={imgSrc} alt="Certificate layout preview" style={{position:'absolute',width:'100%',height:'100%',objectFit:'fill'}}/>}
-   {fields.map((f,i)=><span key={i} style={{position:'absolute',left:f.x+'%',top:f.y+'%',transform:'translate(-50%,-50%)',color:'#a78bfa',fontWeight:700,fontSize:'clamp(8px,'+(f.fontSize/1400*100)+'vw,45px)',textShadow:'0 1px 4px #111'}}>{f.key}</span>)}
+   {fields.map((f,i)=><span key={i} style={{position:'absolute',left:f.x+'%',top:f.y+'%',transform:'translate(-50%,-50%)',color:f.color||'#a78bfa',fontFamily:f.family==='sans'?'Arial,sans-serif':f.family==='mono'?'monospace':'Georgia,serif',textAlign:f.align||'center',fontWeight:700,fontSize:'clamp(8px,'+(f.fontSize/1400*100)+'vw,45px)',textShadow:'0 1px 4px #111'}}>{f.key}</span>)}
   </div>
   <button disabled={busy||!event} onClick={save} style={{padding:12,background:'#a78bfa',color:'#151b2f',fontWeight:700,borderRadius:10}}>{busy?'Saving…':'Save placeholder positions'}</button>
   <p role="status">{message}</p>
