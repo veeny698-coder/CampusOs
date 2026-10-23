@@ -23,6 +23,7 @@ export default async function CertificatesPage(){
   <Link href="/admin/dashboard" className="console-text-link">← Dashboard</Link><div className="eyebrow" style={{marginTop:28}}>CERTIFRENZY / CERTIFICATES</div>
   <h1 className="heading">Every achievement counts. ✦</h1>
   <p className="muted">Issue authentic, uniquely verifiable certificates for event participants.</p>
+  <p><Link className="console-text-link" href="/admin/dashboard/certificates/feedback-responses">Review feedback responses & export CSV ↗</Link></p>
   {error||events.error?<p role="alert">Unable to load event registrations.</p>:<IssueForm registrations={(registrations??[]).map(r=>({...r,event_title:titles.get(r.event_id)||'Event'}))}/>}
   {eventError||templateError?<p role="alert">Unable to load certificate studio settings.</p>:<><TemplateEditor events={allEvents??[]} templates={templates??[]}/><ArtworkUploader events={allEvents??[]} templates={templates??[]}/><PlaceholderEditor events={allEvents??[]} templates={templates??[]}/><FeedbackEditor events={allEvents??[]} templates={templates??[]}/><CoordinatorForm events={allEvents??[]}/><CoordinatorBulk events={allEvents??[]}/></>}
   {(allEvents??[]).length>0&&<section style={{marginTop:24}}><h2>Coordinator download links</h2>{(allEvents??[]).map(e=><p key={e.id}><Link href={'/events/'+e.id+'/coordinators'} target="_blank">{e.title} — Coordinator certificate link ↗</Link></p>)}</section>}
