@@ -40,7 +40,7 @@ export async function GET(request:Request){
  if(eventResult.error||!eventResult.data)return NextResponse.json({error:'Event not found'},{status:404});
  const first=rawPage*PAGE_SIZE;
  const {data:certificates,error:certError}=await access.client.from('event_certificates')
- .select('certificate_code,recipient_name,certificate_type,issued_at')
+ .select('certificate_code,recipient_name,certificate_type,issued_at,custom_fields')
  .eq('event_id',eventId).is('revoked_at',null).order('issued_at',{ascending:true})
  .range(first,first+PAGE_SIZE-1);
  if(certError)return NextResponse.json({error:'Cannot load certificates'},{status:500});
@@ -72,7 +72,7 @@ export async function GET(request:Request){
   const qr=await QRCode.toDataURL(site+'/verify/certificate/'+code,{width:180,margin:1});
   const values:Record<string,string>={
    name:certificate.recipient_name,event:eventResult.data.title,
-   date:new Date(certificate.issued_at).toLocaleDateString('en-IN'),certificate_id:code
+   date:new Date(certificate.issued_at).toLocaleDateString('en-IN'),certificate_id:code,...Object.fromEntries(Object.entries((certificate.custom_fields||{}) as Record<string,unknown>).filter(([,v])=>typeof v==='string'))
   };
   const texts=fields.map(field=>{
    if(!Object.prototype.hasOwnProperty.call(values,field.key))return '';
