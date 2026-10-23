@@ -24,6 +24,7 @@ export default async function PublicEventPage({ params }: { params: Promise<{ id
         Register below to receive your unique QR ticket.
       </div>
       <EventRegistration eventId={event.id} eventTitle={event.title}/>
+      <div style={{display:'flex',gap:18,flexWrap:'wrap',marginTop:24}}><Link href="/certificates/lookup" style={{color:'#b9a5ff'}}>Find participant certificate ↗</Link><Link href={'/events/'+event.id+'/coordinators'} style={{color:'#b9a5ff'}}>Coordinator certificates ↗</Link></div>
     </article>
   </main>;
 }
