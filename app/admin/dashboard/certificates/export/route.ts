@@ -49,14 +49,20 @@ export async function GET(request:Request){
  const base=process.env.NEXT_PUBLIC_SUPABASE_URL;
  const imagePath=template?.image_path;
  let backgroundImage='';
+ let artWidth=1400,artHeight=990;
  if(base&&imagePath&&/^[-a-f0-9]{36}\/[-a-f0-9]{36}\.(png|jpg|webp)$/i.test(imagePath)){
   const source=base+'/storage/v1/object/public/certifrenzy-templates/'+imagePath.split('/').map(encodeURIComponent).join('/');
   const response=await fetch(source,{signal:AbortSignal.timeout(8000)});
   if(response.ok&&Number(response.headers.get('content-length')||0)<5242881){
    const buffer=Buffer.from(await response.arrayBuffer());
    if(buffer.length<=5242880){
-    const type=imagePath.endsWith('.png')?'image/png':imagePath.endsWith('.webp')?'image/webp':'image/jpeg';
-    backgroundImage='data:'+type+';base64,'+buffer.toString('base64');
+    const metadata=await sharp(buffer).metadata();
+    if(metadata.width&&metadata.height&&metadata.width>=300&&metadata.height>=300&&
+       metadata.width*metadata.height<=20000000){
+      artWidth=metadata.width;artHeight=metadata.height;
+      const type=imagePath.endsWith('.png')?'image/png':imagePath.endsWith('.webp')?'image/webp':'image/jpeg';
+      backgroundImage='data:'+type+';base64,'+buffer.toString('base64');
+    }
    }
   }
  }
@@ -76,7 +82,7 @@ export async function GET(request:Request){
   };
   const texts=fields.map(field=>{
    if(!Object.prototype.hasOwnProperty.call(values,field.key))return '';
-   const x=field.x*14,y=field.y*9.9;
+   const x=field.x*artWidth/100,y=field.y*artHeight/100;
    return '<text x="'+x+'" y="'+y+'" font-size="'+field.fontSize+'" fill="'+foreground+'" text-anchor="middle" font-family="Georgia,serif" font-weight="bold">'+escapeXml(values[field.key])+'</text>';
   }).join('');
   const heading=backgroundImage?'':[
@@ -86,14 +92,15 @@ export async function GET(request:Request){
     '<text x="700" y="362" text-anchor="middle" font-size="27" fill="'+foreground+'">'+escapeXml(template?.subtitle||'is proudly presented to')+'</text>',
     '<text x="700" y="890" text-anchor="middle" font-size="24" fill="'+foreground+'">'+escapeXml(template?.footer||'Issued by CampusOS')+'</text>'
    ].join('');
-  const qx=Math.max(7,Math.min(93,Number(template?.qr_x)||86))*14;
-  const qy=Math.max(9,Math.min(91,Number(template?.qr_y)||78))*9.9;
-  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="990" viewBox="0 0 1400 990">'+
-   '<rect width="1400" height="990" fill="'+back+'"/>'+
-   (backgroundImage?'<image x="0" y="0" width="1400" height="990" preserveAspectRatio="none" href="'+backgroundImage+'"/>':'')+
+  const qrSize=Math.max(80,Math.min(200,Math.min(artWidth,artHeight)*0.20));
+  const qx=Math.max(qrSize/2+8,Math.min(artWidth-qrSize/2-8,Math.max(0,Math.min(100,Number(template?.qr_x)||86))*artWidth/100));
+  const qy=Math.max(qrSize/2+8,Math.min(artHeight-qrSize/2-8,Math.max(0,Math.min(100,Number(template?.qr_y)||78))*artHeight/100));
+  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+artWidth+'" height="'+artHeight+'" viewBox="0 0 '+artWidth+' '+artHeight+'">'+
+   '<rect width="'+artWidth+'" height="'+artHeight+'" fill="'+back+'"/>'+
+   (backgroundImage?'<image x="0" y="0" width="'+artWidth+'" height="'+artHeight+'" preserveAspectRatio="none" href="'+backgroundImage+'"/>':'')+
    heading+texts+
-   '<rect x="'+(qx-100)+'" y="'+(qy-100)+'" width="200" height="200" fill="#ffffff"/>'+
-   '<image x="'+(qx-93)+'" y="'+(qy-93)+'" width="186" height="186" href="'+qr+'"/></svg>';
+   '<rect x="'+(qx-qrSize/2)+'" y="'+(qy-qrSize/2)+'" width="'+qrSize+'" height="'+qrSize+'" fill="#ffffff"/>'+
+   '<image x="'+(qx-qrSize/2+7)+'" y="'+(qy-qrSize/2+7)+'" width="'+(qrSize-14)+'" height="'+(qrSize-14)+'" href="'+qr+'"/></svg>';
   const png=await sharp(Buffer.from(svg)).png().toBuffer();
   zip.file('certificate-'+code+'.png',png);
  }
