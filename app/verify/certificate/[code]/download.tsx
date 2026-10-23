@@ -2,7 +2,7 @@
 import {useEffect,useRef,useState} from 'react';
 import QRCode from 'qrcode';
 
-type Placeholder={key:string;x:number;y:number;fontSize:number};
+type Placeholder={key:string;x:number;y:number;fontSize:number;color?:string;family?:string;align?:string};
 export type CertificateData={
  name:string;event:string;code:string;type:string;issued:string;status:string;
  title?:string;subtitle?:string;footer?:string;primary?:string;background?:string;text?:string;
@@ -63,7 +63,10 @@ export default function DownloadCertificate({info}:{info:CertificateData}){
    const x=Math.max(0,Math.min(100,Number(field.x)))*width/100;
    const y=Math.max(0,Math.min(100,Number(field.y)))*height/100;
    const size=Math.max(10,Math.min(130,Number(field.fontSize)));
-   ctx.font='bold '+size+'px Georgia,serif';
+   ctx.fillStyle=field.color&&/^#[0-9a-f]{6}$/i.test(field.color)?field.color:(info.text||'#ffffff');
+   ctx.textAlign=field.align==='left'?'left':field.align==='right'?'right':'center';
+   const font=field.family==='sans'?'Arial,sans-serif':field.family==='mono'?'monospace':'Georgia,serif';
+   ctx.font='bold '+size+'px '+font;
    ctx.fillText(String(values[field.key]||''),x,y,Math.max(40,Math.min(width*0.85,width-2*Math.abs(x-width/2)-20)));
   }
   const qr=await QRCode.toDataURL(window.location.origin+(info.verificationPath||'/verify/certificate/'+info.code),{width:220,margin:1});
