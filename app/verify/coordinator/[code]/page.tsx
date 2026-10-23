@@ -22,6 +22,6 @@ export default async function CoordinatorCertificate({params}:{params:Promise<{c
   <p>{new Date(r.issued_at).toLocaleDateString('en-IN')}</p>
   <p role="status" style={{color:r.status==='valid'?'#86efac':'#fca5a5'}}>{r.status==='valid'?'✓ Authentic coordinator certificate':'Certificate revoked'}</p>
   <p style={{fontSize:12,overflowWrap:'anywhere'}}>Certificate ID: {code}</p>
-  <DownloadCertificate info={{name:r.recipient_name,event:r.event_name,issued:r.issued_at,code,status:r.status,type:'coordinator',title:'Certificate of Coordination',imagePath:r.image_path,placeholders:r.placeholders,customFields:r.custom_fields,verificationPath:'/verify/coordinator/'+code}}/>
+  <DownloadCertificate info={{name:r.recipient_name,event:r.event_name,issued:r.issued_at,code,status:r.status,type:'coordinator',title:'Certificate of Coordination',imagePath:r.image_path,placeholders:r.placeholders,customFields:r.custom_fields,verificationPath:'/verify/coordinator/'+code,qrX:r.qr_x,qrY:r.qr_y}}/>
   </article></main>;
 }
