@@ -6,11 +6,16 @@ import { signOut } from '../../dashboard/sign-out';
 export const dynamic = 'force-dynamic';
 
 // Supabase network calls must not leave the server-rendered dashboard pending forever.
-function within<T>(work: PromiseLike<T>, timeoutMs = 10000): Promise<T> {
-  return Promise.race([
-    Promise.resolve(work),
-    new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Dashboard data request timed out')), timeoutMs)),
-  ]);
+async function within<T>(work: PromiseLike<T>, timeoutMs = 10000): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      Promise.resolve(work),
+      new Promise<T>((_, reject) => { timer = setTimeout(() => reject(new Error('Dashboard data request timed out')), timeoutMs); }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 }
 
 function DataError({ message }: { message: string }) {
