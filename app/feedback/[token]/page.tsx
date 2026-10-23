@@ -18,7 +18,7 @@ export default async function FeedbackPage({params}:{params:Promise<{token:strin
    <Link href="/">campusOS. ✦</Link><h1>Event Feedback</h1>
    <h2>{record.event_title}</h2><p className="muted">Participant: {record.participant_name}</p>
    <p>Submit your feedback to become eligible for an event certificate.</p>
-   <FeedbackForm token={token} alreadySubmitted={record.already_submitted}/>
+   <FeedbackForm token={token} alreadySubmitted={record.already_submitted} questions={record.feedback_questions} open={record.feedback_open}/>
   </section>
  </main>;
 }
