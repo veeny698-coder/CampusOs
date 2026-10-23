@@ -1,5 +1,5 @@
 'use client';
-import {useRef,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import QRCode from 'qrcode';
 
 type Placeholder={key:string;x:number;y:number;fontSize:number};
@@ -18,6 +18,7 @@ export default function DownloadCertificate({info}:{info:CertificateData}){
  const canvas=useRef<HTMLCanvasElement>(null);
  const [busy,setBusy]=useState(false);
  const [message,setMessage]=useState('');
+ const [previewReady,setPreviewReady]=useState(false);
  async function imageFrom(src:string){
   const image=new Image();image.crossOrigin='anonymous';image.src=src;
   await new Promise<void>((resolve,reject)=>{image.onload=()=>resolve();image.onerror=()=>reject(Error('Unable to load certificate background image'));});
@@ -56,7 +57,7 @@ export default function DownloadCertificate({info}:{info:CertificateData}){
    const y=Math.max(0,Math.min(100,Number(field.y)))*9.9;
    const size=Math.max(10,Math.min(130,Number(field.fontSize)));
    ctx.font='bold '+size+'px Georgia,serif';
-   ctx.fillText(String(values[field.key]||''),x,y,Math.min(1200,1400-2*Math.abs(x-700)-35));
+   ctx.fillText(String(values[field.key]||''),x,y,Math.max(40,Math.min(1200,1400-2*Math.abs(x-700)-35)));
   }
   const qr=await QRCode.toDataURL(window.location.origin+(info.verificationPath||'/verify/certificate/'+info.code),{width:220,margin:1});
   const image=await imageFrom(qr);
@@ -66,6 +67,7 @@ export default function DownloadCertificate({info}:{info:CertificateData}){
   ctx.drawImage(image,qx-93,qy-93,186,186);
   return el;
  }
+ useEffect(()=>{let active=true;void render().then(()=>{if(active)setPreviewReady(true);}).catch(err=>{if(active)setMessage(err instanceof Error?err.message:'Preview unavailable');});return ()=>{active=false;};},[]);
  async function png(){
   setBusy(true);setMessage('');
   try{
@@ -95,7 +97,7 @@ export default function DownloadCertificate({info}:{info:CertificateData}){
   }catch(error){setMessage(error instanceof Error?error.message:'PDF export failed');}finally{setBusy(false);}
  }
  return <section style={{display:'grid',justifyItems:'center',gap:12,marginTop:26}}>
-  <canvas ref={canvas} width={1400} height={990} aria-label="Certificate artwork" style={{display:'none'}}/>
+  <canvas ref={canvas} width={1400} height={990} aria-label="Certificate artwork preview" style={{display:"block",width:"100%",maxWidth:860,aspectRatio:"1400/990",opacity:previewReady?1:0.3,borderRadius:8}}/>
   {info.status==='valid'?<div style={{display:'flex',gap:12,flexWrap:'wrap',justifyContent:'center'}}>
    <button disabled={busy} onClick={png} style={{padding:12,borderRadius:8,background:'#a78bfa',color:'#151b2f'}}>Download PNG</button>
    <button disabled={busy} onClick={pdf} style={{padding:12,borderRadius:8,background:'#a78bfa',color:'#151b2f'}}>Save as PDF</button>
