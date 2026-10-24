@@ -80,7 +80,7 @@ export default function DownloadCertificate({info}:{info:CertificateData}){
   const brandSize=Math.max(14,Math.round(Math.min(width,height)*0.020));
   ctx.textAlign='center';ctx.textBaseline='middle';
   ctx.font='600 '+brandSize+'px Arial,sans-serif';
-  const label='Powered by CertiFrenzi';
+  const label='Powered by CertiFrenzy';
   const brandWidth=Math.min(width-24,ctx.measureText(label).width+30);
   const brandY=Math.max(brandSize+12,height-28);
   ctx.fillStyle='rgba(12,18,34,0.82)';
