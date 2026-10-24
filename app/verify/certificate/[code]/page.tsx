@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import DownloadCertificate from './download';
+import CertificateShare from './certificate-share';
 import { createClient } from '@supabase/supabase-js';
 export const dynamic='force-dynamic';
 export default async function VerifyCertificate({params}:{params:Promise<{code:string}>}){
@@ -27,6 +28,7 @@ export default async function VerifyCertificate({params}:{params:Promise<{code:s
    <strong style={{color:record.status==='valid'?'#86efac':'#fca5a5'}}>{record.status==='valid'?'✓ Authentic certificate — Verified':'Certificate revoked'}</strong>
    <p style={{fontSize:12,overflowWrap:'anywhere',color:'#aab6d0'}}>Verification ID: {code}</p>
    <DownloadCertificate info={{name:record.recipient_name,event:record.event_name,code,type:record.certificate_type,issued:record.issued_at,status:record.status,title:record.title,subtitle:record.subtitle,footer:record.footer,primary:record.primary_color,background:record.background_color,text:record.text_color,imagePath:record.image_path,placeholders:record.placeholders,customFields:record.custom_fields,qrX:record.qr_x,qrY:record.qr_y}}/>
+   <CertificateShare name={record.recipient_name} event={record.event_name} code={code} issued={record.issued_at} kind={record.certificate_type}/>
   </article>
  </main>;
 }
