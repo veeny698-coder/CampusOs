@@ -15,7 +15,7 @@ export default async function FeedbackPage({params}:{params:Promise<{token:strin
  if(!record)notFound();
  return <main style={{minHeight:'100vh',display:'grid',placeItems:'center',padding:24}}>
   <section style={{width:'100%',maxWidth:580,padding:30,background:'#151b2f',border:'1px solid #34365b',borderRadius:20}}>
-   <Link href="/">campusOS. ✦</Link><h1>Event Feedback</h1><p style={{fontSize:12,color:"#b9a5ff"}}>Powered by CertiFrenzi</p>
+   <Link href="/">campusOS. ✦</Link><h1>Event Feedback</h1><p style={{fontSize:12,color:"#b9a5ff"}}>Powered by CertiFrenzy</p>
    <h2>{record.event_title}</h2><p className="muted">Participant: {record.participant_name}</p>
    <p>Submit your feedback to become eligible for an event certificate.</p>
    <FeedbackForm token={token} alreadySubmitted={record.already_submitted} questions={record.feedback_questions} open={record.feedback_open}/>
