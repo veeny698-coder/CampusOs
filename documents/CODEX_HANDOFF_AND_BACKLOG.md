@@ -1,97 +1,118 @@
-# Codex Handoff — CampusOS main branch
-**Updated:** 24 October 2026 · **Destination:** `veeny698-coder/CampusOs`, **branch `main` ONLY**.
+# CampusOS — FULL CODEX ENGINEERING HANDOFF
+**Canonical branch:** `main` · **Audit date:** 24 October 2026 · **Handoff status:** Development, NOT production complete.
 
-## Start here
+> THIS IS A HANDOFF FOR AN ENGINEERING AGENT, NOT AN ALL-PHASES "DONE" CLAIM. Start by reading `AGENTS.md` at repository root and `documents/IMPLEMENTATION_MASTER_PLAN.md`.
 
-1. Read `documents/CampusOS_Full_Master_PRD_All_Phases.md` (the full text of the original 34-page PRD, drafted 22 October 2026).
-2. Read `documents/CampusOS_Complete_SRS_All_Phases.md` (the full text of the original 23-page SRS, v1.0, 304 target requirements).
-3. Read `documents/CAMPUSOS_COMPLETION_AUDIT_2026-10-24.md` and `docs/ORIGINAL_CERTIFRENZY_MIGRATION.md`.
-4. Inspect original uploaded **`certifrenzi-main(1).zip`** and the existing GitHub code. This ZIP is the UI/interaction design authority, not the recently invented CertiFrenzy UI.
-5. Do not start with new page mockups; keep original UI including layout, forms, custom image/template editor, coordinate controls, feedback, coordinators, QR authenticity, ID lookup, shares, exported artwork and responsive styles.
+## 1. Non-negotiable request, in the product owner's own terms (paraphrased)
+- The previous certificate dashboard became confusing and diverged too far from original CertiFrenzy. **Take original CertiFrenzy UI and code the same way** rather than re-designing it. Only replace separate database/auth with shared Supabase.
+- QRBlaze/CertiFrenzy Events/Scanner/Certificates and every next module are **separate portals**. Portals can be assigned/removed dynamically to exact people and scopes, and this must actually enable/disallow operations.
+- Use **one Supabase database** and the **same canonical event IDs**; avoid QRBlaze and CertiFrenzy creating separate events/registrants.
+- Always preserve **Powered by CertiFrenzy** branding on certificate exports and public views.
+- One user account may belong to many college societies. Owner/society/HOD/faculty/coordinator roles get scoped access.
+- Keep GitHub changes in **main**, no unapproved production deployment. Vercel ignored Git build command currently `exit 0`.
+- Entire product includes original all-phases PRD/SRS, not just the first usable release. AI-initiated mutations require explicit confirmation.
 
-## Non-negotiables from product owner
+## 2. Inputs and source-of-truth
+| Asset | Location | Authority and notes |
+|---|---|---|
+| PRD original | `documents/originals/CampusOS_Full_Master_PRD_All_Phases.docx` **pending binary commit** | Exact uploaded Word file, 34 pages, 20 tables, hash in originals/README |
+| SRS original | `documents/originals/CampusOS_Complete_SRS_All_Phases.docx` **pending binary commit** | Exact Word, 23 pages, 304 requirements + 20 acceptance cases, hash in originals/README |
+| Searchable PRD | `documents/CampusOS_Full_Master_PRD_All_Phases.md` | Earlier extracted text, tables may be flattened |
+| Searchable SRS | `documents/CampusOS_Complete_SRS_All_Phases.md` | Earlier extracted text, NOT the original visual layout |
+| Original CertiFrenzi | `certifrenzi-main(1).zip` from user upload/source pack | UI/behavior reference; audit ZIP secrets before copying |
+| Current code | GitHub `veeny698-coder/CampusOs`, main | Functional starting point; not UX authority for certificates |
+| Constraints | `AGENTS.md` and `documents/knowledge-base/` | Implementation and security rules |
+| Plan | `documents/IMPLEMENTATION_MASTER_PLAN.md` | Deep P0–P7 work breakdown, stage gates |
+| Parity | `documents/qa/certifrenzy-parity-matrix.md` | Mark each original screen against new screenshots |
 
-- **One Supabase DB, one event identity** across QRBlaze, CertiFrenzy, events, participants and attendance.
-- Each functional area **is a standalone portal** with independent routing: Events, QR scanner, certificate/CertiFrenzy; future society, ID cards, meetings, auditions, results etc.
-- Platform Super Admin can dynamically **assign and remove any portal** to a member, at institution, organization or event scope. Enforcement must happen at server actions, RLS/RPCs and exports, **not only menus**.
-- Users can belong to several society workspaces with one login; data fully isolated across colleges. Preserve hierarchy: institution → society/department/committee → event → sub-event.
-- **Exact original CertiFrenzy frontend**. Change data access to shared Supabase, not its proven design and workflows. Keep **Powered by CertiFrenzy** permanently visible in certificates and public views.
-- AI assistant must explicitly request confirmation **before EVERY write**; no silent writes.
-- Launch at one complimentary founding institution, support paid multi-college SaaS.
-- **Use GitHub `main` branch for changes**, keep Vercel auto builds disabled; do not manually deploy without user authorization.
-- Keep existing data intact; avoid destructive migrations and auth regressions.
+**Source hashes:** PRD `40f307022b250207557663c40aaf79c1d802367bd81dfc53ada7721602ed9947`; SRS `10caca437218b83592d40b5f017ec812d1fcd7c97f9de06e3f171d9c882359e6`. The new attached originals match prior uploads byte-for-byte. Do NOT re-create them from Markdown.
 
-## Immediate engineering task sequence
+## 3. Current project and repo
+- Next.js App Router, React/TypeScript, Supabase Auth/Postgres/RLS and Storage.
+- Repo: `veeny698-coder/CampusOs`; Vercel `campus-os`, domain `campusblaze-os.vercel.app`.
+- Supabase project `dcpetrudlngtrabmdwol`.
+- Core files: `lib/supabase/server.ts`, `lib/auth/platform-owner.ts`, `lib/portal-access.ts`.
+- Current portal control: `app/admin/dashboard/portals`, `app/portals`, `portal_catalog`, `portal_assignments`, `has_portal_access`.
+- Event/QR: `app/admin/dashboard/events`, `app/events/[id]`, `app/admin/dashboard/check-in`, attendance pages and check-in migrations.
+- CertiFrenzi interim: `app/admin/dashboard/certificates`, `app/feedback/[token]`, `app/verify/**`, `app/certificates/lookup`; **NOT pixel-identical original**.
+- Source migrations: `supabase/migrations/202610220001_foundation.sql` → `202610240005_assigned_qr_checkin.sql`. Never reset the database or assume migrations apply in arbitrary order.
 
-### P0 — make current work trustworthy and easy to use
+## 4. Verified data and release baseline
+At 24 Oct 2026 audit: institutions **1**, platform owners **3**, organizations/events/registrations/feedback/issued certs/coordinators/portal grants **all 0**. This is a **test gap**, not proof of working business workflows. Earlier CI verified typecheck/build for feature commits, but no complete real-user acceptance tests. Recent automatic Vercel deployments CANCELED because build ignored; latest GitHub main **not proven live**.
 
-- [ ] Use original ZIP for a **screen-by-screen/feature-by-feature parity inventory**, with file paths and screenshots for desktop/mobile. Reuse React component code and styles where feasible; map original Firebase calls to new repositories/adapters backed by Supabase.
-- [ ] Preserve original event-detail page, feedback setup/required questions, template positioning/drag-drop, coordinator templates and rosters, custom links, certificate ID, authentify and sharing. Verify participant self-claim *after feedback*, with idempotent issuance and revoked-state behaviour.
-- [ ] Collapse confusing bespoke CertiFrenzy settings into original UI; separate super-admin portal assignment UI from institution operator UX. Do not leave two competing certificate admin screens.
-- [ ] Ensure `portal_catalog` + `portal_assignments` + `has_portal_access` control **all** protected Events, QR, CertiFrenzy reads/writes/exports. Expose actual role-scoped route entry points; do not simply show inaccessible links.
-- [ ] Check current QR-only delegated read/export access, scanner event matching and genuine deprovisioning.
-- [ ] Run compile/lint/typecheck and module tests; fix known type issues if any. CI is necessary but not sufficient.
-- [ ] Add repeatable end-to-end workflows in isolated test project: owner creates institution → creates society/event → registration → QR scan → feedback → certificate issue/download/QR verification; coordinator CSV/import, custom fields, revocation; separate user denied cross-institution access.
+Previous estimate: **15–25%** of entire target product, **40–55%** of first-release code foundation; *coarse estimates*, not actual 304 requirement pass rate. Re-evaluate through trace matrix, do not simply repeat percentage as fact.
 
-**P0 acceptance:** original UI signed off by product owner; same event visible in all portals; no assigned-role dead ends; scoped reads/writes/exports properly secured; flows tested and documented.
+## 5. Top critical problems
+**Critical P0:** Original CertiFrenzy UI absent. Template editor and admin screen were re-created from scratch and rejected by owner. Import original JSX/CSS, keep layout and behavior, adapt data calls.
+**Critical P0:** Per-portal access ineffective outside QR scanner. `portal_assignments` can record access but Events and certificate admin server actions remain mostly owner-only. Complete scopes/action grants and immediate revocation.
+**Critical P0:** Shared event model only partly used and not E2E proven. Original legacy slug/event IDs may map differently. Ensure no parallel event registration, QR, certificate records.
+**Critical P0:** Public lookup/token security, unversioned templates, coordinator proof/attendance and bulk delivery require hardening against SRS CER obligations.
+**Critical P1:** Institution and organization provisioning, invitation/member onboarding, role delegation and workspace switcher incomplete. Without these, no viable non-founder admin workflow.
+**Critical QA:** 0 live events, so no acceptance run; setup seeded isolated staging with 2 tenants, 2 societies per tenant, scoped users, passes, certificates.
+**Major future:** meetings/ID cards, recruitment, auditions, competitions, communications, AI/n8n, analytics, billing/contracts, enterprise reliability not built.
 
-### P1 — finish original Release 1
+## 6. DO FIRST — 20 concrete Codex actions
+1. Inspect `AGENTS.md`, this handoff, implementation plan and exact original source files.
+2. Copy original PRD/SRS DOCX binaries from provided `CampusOS_Codex_Original_Source_Pack.zip` into `documents/originals/`. Validate exact hashes; commit to main.
+3. Run `python scripts/build_requirements_index.py`; verify 304 SRS requirements and 20 test cases, 172 PRD capability IDs. Commit CSVs and manual source verification notes. Distinguish PRD/SRS IDs.
+4. Audit original CertiFrenzi ZIP tree; identify UI files/assets, dependencies, original Firebase auth/database and hardcoded public URLs. Make original route-to-new route map.
+5. Generate screenshots of original UI at desktop/mobile from isolated original code with fake/local safe data. Review each with product owner.
+6. Create staged tenant A/B fixtures and scoped users; never use real student data or production writes for testing.
+7. Inspect every `SECURITY DEFINER` function, RLS grants, Storage policy and public RPC; record current authorized actors.
+8. Design `portal action` policy with role, action, institution, organization, event, validity and scope; ensure role inheritance and grantor limits.
+9. Implement full delegated portal access with secure check at every route, API, action and export. Existing scanner should not imply roster export privileges.
+10. Implement tenant owner, society/department CRUD, membership invites and active workspace switching (without second user account).
+11. Make all event and sub-event identifiers canonical; add safe alias mapping for old CertiFrenzi slugs and historic verification routes.
+12. Extract CertiFrenzi legacy data calls into typed Supabase adapters; copy UI/CSS without re-inventing screens.
+13. Replace bespoke certificate admin with original flows behind a feature flag, preserving old tables/data until safe cutover.
+14. Implement feedback form and versioned rules, eligibility + recipient category, immutable template snapshot, idempotent issue/verify/revoke/reissue.
+15. Implement original template editor layout and generator; test pixel parity including portrait and landscape output, QR and branding.
+16. Implement coordinator roster/custom fields and certificate eligibility tied to confirmed staff role/hours/supervisor where required.
+17. Test full path: event → registration → QR check-in → feedback → claim → PNG/PDF/QR verify; repeat for coordinator; test revoked/invalid IDs.
+18. Run negative authorization for every scope and after revoke/expiry; test two colleges and independent societies.
+19. Run CI typecheck/build, migrations in disposable DB, Playwright E2E and source screenshot comparison; add audit/report evidence.
+20. Post concise completion report with requirement IDs, files, tests and outstanding gaps; do NOT deploy without explicit owner request.
 
-- [ ] Full institution CRUD (soft-delete/archive) and delegated college-owner onboarding; organization/society/department CRUD.
-- [ ] RBAC role policies for HOD, faculty head, society head, coordinator, member, student, multi-workspace switcher and user invitations.
-- [ ] Unified event hierarchy and nested sub-events, approvals, schedules, publish/unpublish, organizer ownership.
-- [ ] Real registrations, native custom form designer, CSV/third-party imports, duplicate detection, email/QR delivery and reminder templates.
-- [ ] Operations dashboard for events/attendance/certificates, event staff scanner sessions, exports, admin audit.
-- [ ] Frontend accessibility/responsive audits, invalid/empty/error/loading states, navigation simplification.
+## 7. Original CertiFrenzi acceptance contract
+Do not classify parity complete until all of these are owner-approved:
+- Original landing/admin/events/event detail screen visual layout and navigation.
+- Dynamic feedback questions/required fields/feedback link/response management.
+- Participant search/claim behavior and certificate availability conditions.
+- Original certificate-template editor, uploaded images, position controls, fonts/signatures/QR.
+- Coordinator-specific roster, custom fields, links and lookup flows.
+- Unique certificate ID and public authenticity QR with revoked/expired handling.
+- PNG/PDF and batch export true artwork, matching preview/format including long names.
+- Historical certificate URLs, redirects and migrated provenance where relevant.
+- **Powered by CertiFrenzy** stamped on each issued/downloaded artifact and visible on verification.
+- No separate certificate database; single `events.id`.
 
-**P1 acceptance:** another college/society can be onboarded, owner assigns portals, member operates event + QR + CertiFrenzy without being platform owner.
+## 8. Detailed security boundaries
+- Same principal can hold multiple memberships; choose workspace server-side and confirm each resource scope.
+- Platform founder not used as generic tenant data reader; approved support impersonation audited and expiring.
+- Source SRS ACL covers fine action rights, inheritance, limited delegation, expiry, sensitive exports and AI parity; current basic portal grants do not satisfy this.
+- Role grant only with grantor's own delegable rights; deny ambiguous or expired grants; revoke independently of frontend cache.
+- QR token opaque; check exact attendance context and active window. Avoid global checked_in flag for staff/meeting vs participant.
+- Verification output minimal public data. Feedback answers/rosters not enumerated publicly.
+- Protect public lookup/ticket endpoints against guessing/rate attacks, verify uploads and provider webhooks, use private buckets appropriately.
+- No service-role key in browser, no Firebase credentials from archived ZIP.
 
-### P2 — remaining PRD/SRS target product (commercial all-phases)
+## 9. Evidence & traceability
+Each issue: product statement; PRD:<id>; SRS:<id>; intended actor/action/scope; schema migration; UI file; API/RPC; positive/negative test; screenshot; QA decision. Use statuses `NOT_STARTED`, `PARTIAL`, `IMPLEMENTED_UNVERIFIED`, `VERIFIED`, `BLOCKED`, `DEFERRED_APPROVED`. No automated `VERIFIED` assignment.
 
-- [ ] Student/faculty/society operational portals, meetings and QR membership IDs.
-- [ ] Digital society ID-card editor, templates, QR verification and membership lifecycle.
-- [ ] Auditions/recruitment, application review, shortlist/select/reject, staff and notifications.
-- [ ] Event competitions/jury scoring/results; hierarchy-specific reporting.
-- [ ] AI task agent + n8n integration with confirmation on all writes, least-privilege execution, tracing and error handling.
-- [ ] Certificates advanced lifecycle (feedback gating, participant/coordinator/staff, bulk issue, duplicate/revoke), branding controls with original UX.
-- [ ] Dashboards, analytics, communications/campaigns, exports and audit retention.
-- [ ] Subscription catalog, founding-institution complimentary entitlement, paid tenant billing, service limits, finance/resources.
-- [ ] Monitoring/error alerts, backups/restore, SLA, test/load/security reviews, documentation and release playbooks.
+## 10. Explicit owner decisions
+- main branch only; no auto-deploy
+- same original CertiFrenzi code/UI
+- same Supabase DB, canonical events and user identity
+- portals dynamically assign/remove
+- permanent Powered by CertiFrenzy branding
+- AI confirms every mutation
+- complimentary first-college plan by contract, paid future institutions
 
-## Files / existing architecture
+## 11. Work breakdown, gates and human acceptance
+See `documents/IMPLEMENTATION_MASTER_PLAN.md` for detailed foundation, security, organizations, events, QR, CertiFrenzi, societies/IDs/meetings, recruitment/competitions, AI and billing phases with gates G0–G7. Use `documents/knowledge-base/TESTING_AND_RELEASE.md` for cross-tenant fixture and release checklist. Every passed test must include actual logs/screenshots and exact commit.
 
-- `supabase/migrations/202610220001_foundation.sql`: core institutions, organizations, memberships, events and FK.
-- `supabase/migrations/202610230002_event_registrations.sql`: registrations and ticket issuance.
-- `supabase/migrations/202610230003_event_checkin.sql` + `202610240005_assigned_qr_checkin.sql`: check-in and scoped authorization.
-- `supabase/migrations/202610230005_certificates.sql` through `202610230019_coordinator_qr_layout.sql`: certificate functions, templates, coordinators and feedback.
-- `supabase/migrations/202610240001_portal_assignments.sql` through `202610240004_portal_membership_revocation.sql`: registry and assignments.
-- `lib/supabase/server.ts`, `lib/auth/platform-owner.ts`, `lib/portal-access.ts`: auth/data access.
-- `app/admin/dashboard/portals`, `app/portals`: management/hub.
-- `app/admin/dashboard/certificates`: **interim bespoke UX, not original design**.
-- `app/events/[id]`, `app/feedback/[token]`, `app/verify/**`, `app/certificates/lookup`: public flows.
+## 12. First Codex session prompt — COPY THIS
+"Open AGENTS.md, documents/README.md, documents/CODEX_HANDOFF_AND_BACKLOG.md, documents/IMPLEMENTATION_MASTER_PLAN.md, and all documents/knowledge-base/*.md. Inspect the original user-supplied DOCX and certifrenzi-main ZIP source pack. Work on main. First restore exact source DOCX binaries, hash-verify, run scripts/build_requirements_index.py and commit the source/trace CSVs. Then inventory original CertiFrenzi UI and perform an exact UI code transplant (not a redesign), replacing Firebase with shared Supabase data adapters keyed by events.id. Complete dynamic scoped portal action grants for Events, QR Scanner and CertiFrenzi, route/RLS/RPC/export enforcement. Establish staged two-college E2E tests, maintain Powered by CertiFrenzy in rendered certificates, and report source requirement IDs, test evidence and blockers. Do not deploy or enable Vercel automatic Git builds without my approval. Do not claim production readiness from CI alone."
 
-## Testing matrix (must implement)
-
-| Actor | Within assigned event | Outside assigned event | Other institution | After revoke |
-| --- | --- | --- | --- | --- |
-| Platform owner | Admin-permitted (audited) | Admin-permitted | Admin-permitted | Owner bypass remains |
-| College owner | Approved college operations | Denied unless scoped | Denied | Denied if revoked |
-| Society head | Operate own assigned scope | Denied | Denied | Denied |
-| Coordinator | QR scan own event | Denied | Denied | Denied |
-| Student/participant | Register and own feedback/certificate | No private staff records | No private records | No staff portal |
-| Anonymous | Public published event/registration/verification only | No internal management | No internal management | N/A |
-
-Test **each** protected GET, server action, REST route, table RLS and SECURITY DEFINER RPC. Public bearer links/tickets require throttling, expiration/revocation policy and privacy review.
-
-## Known gaps / don't mistake for done
-
-- Existing platform-owner certificates/events UI isn't permission-complete for assigned users.
-- 0 recorded real events/registrations/certificates/assignments at audit time; tests cannot claim success in production.
-- Github CI passing only confirms build/typecheck.
-- Previous attempt to create one-time production Vercel build does not prove current `main` is live.
-- No production-rated AI/n8n, subscriptions, advanced society ops, ID cards, auditions/meetings.
-- Original DOCX source documents were converted into text-complete `.md` archives in `documents/` to make them directly readable by Codex; Word formatting is not preserved.
-
-## Codex first prompt (copy directly)
-
-> Read documents/CAMPUSOS_COMPLETION_AUDIT_2026-10-24.md, documents/CampusOS_Full_Master_PRD_All_Phases.md, documents/CampusOS_Complete_SRS_All_Phases.md and docs/ORIGINAL_CERTIFRENZY_MIGRATION.md. Inspect the original CertiFrenzi ZIP. Work on main. Preserve original frontend UI and interactions exactly, replace legacy backend with shared Supabase keyed by events.id, and make every portal dynamically assignable with enforced scoped permissions. Implement the P0 checklist and test end-to-end before P1. Maintain existing DB, existing auth, Powered by CertiFrenzy branding and disabled Vercel automatic builds. Do not claim completion without tests. Commit and report every change, test and remaining blocker.
+## 13. Handoff completeness limitations
+This document organizes engineering work; it does not contain all original source code or unchanged DOCX binaries inside GitHub yet. The provided source ZIP must be supplied to Codex and added locally only after auditing. User's original DOCX formatting cannot be inferred from older Markdown exports. Requirements and plan are not evidence of implemented features. The repo on main remains a partially implemented platform, not full CampusOS.
