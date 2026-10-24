@@ -17,7 +17,7 @@ export default async function CoordinatorCertificate({params}:{params:Promise<{c
  return <main style={{minHeight:'100vh',background:'#0d1424',color:'#fff',display:'grid',placeItems:'center',padding:24}}>
   <article style={{width:'100%',maxWidth:860,background:'#151b2f',border:'5px double #a78bfa',padding:48,textAlign:'center',borderRadius:12}}>
   <Link href="/">campusOS. ✦</Link>
-  <p style={{letterSpacing:2,color:'#b9a5ff'}}>Powered by CertiFrenzi</p>
+  <p style={{letterSpacing:2,color:'#b9a5ff'}}>Powered by CertiFrenzy</p>
   <h1>Certificate of Coordination</h1><p>Presented with appreciation to</p>
   <h2 style={{fontSize:42,color:'#f5e9bf'}}>{r.recipient_name}</h2><p>For coordinating</p><h3>{r.event_name}</h3>
   <p>{new Date(r.issued_at).toLocaleDateString('en-IN')}</p>
