@@ -76,6 +76,17 @@ export default function DownloadCertificate({info}:{info:CertificateData}){
   const qy=Math.max(qrSize/2+8,Math.min(height-qrSize/2-8,Math.max(0,Math.min(100,info.qrY??78))*height/100));
   ctx.fillStyle='#ffffff';ctx.fillRect(qx-qrSize/2,qy-qrSize/2,qrSize,qrSize);
   ctx.drawImage(image,qx-qrSize/2+7,qy-qrSize/2+7,qrSize-14,qrSize-14);
+  // Mandatory attribution is drawn on the exported canvas even with custom artwork.
+  const brandSize=Math.max(14,Math.round(Math.min(width,height)*0.020));
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.font='600 '+brandSize+'px Arial,sans-serif';
+  const label='Powered by CertiFrenzi';
+  const brandWidth=Math.min(width-24,ctx.measureText(label).width+30);
+  const brandY=Math.max(brandSize+12,height-28);
+  ctx.fillStyle='rgba(12,18,34,0.82)';
+  ctx.fillRect((width-brandWidth)/2,brandY-brandSize-7,brandWidth,brandSize+14);
+  ctx.fillStyle='#ffffff';
+  ctx.fillText(label,width/2,brandY,Math.max(40,brandWidth-14));
   return el;
  }
  useEffect(()=>{let active=true;void render().then(()=>{if(active)setPreviewReady(true);}).catch(err=>{if(active)setMessage(err instanceof Error?err.message:'Preview unavailable');});return ()=>{active=false;};},[]);
