@@ -7,9 +7,15 @@ export default async function PortalHub(){
  const client=await createSupabaseServerClient();
  const {data:{user}}=await client.auth.getUser();
  if(!user)redirect('/login');
- const {data:owner}=await client.from('platform_owners').select('user_id').eq('user_id',user.id).maybeSingle();
- const {data:catalog,error:catalogError}=await client.from('portal_catalog').select('key,label,description,route').eq('enabled',true).order('label');
- const {data:assignments,error:assignmentsError}=await client.from('portal_assignments').select('portal_key,institution_id,event_id,organization_id').eq('user_id',user.id).limit(200);
+ // Independent RLS-scoped reads run concurrently to minimize portal load time.
+ const [ownerResult,catalogResult,assignmentsResult]=await Promise.all([
+  client.from('platform_owners').select('user_id').eq('user_id',user.id).maybeSingle(),
+  client.from('portal_catalog').select('key,label,description,route').eq('enabled',true).order('label'),
+  client.from('portal_assignments').select('portal_key,institution_id,event_id,organization_id').eq('user_id',user.id).limit(200)
+ ]);
+ const {data:owner}=ownerResult;
+ const {data:catalog,error:catalogError}=catalogResult;
+ const {data:assignments,error:assignmentsError}=assignmentsResult;
  if(catalogError||assignmentsError)return <main style={{padding:32}} role="alert">Unable to load assigned portals. Your permissions have not changed.</main>;
  const allowed=new Set((assignments??[]).map(a=>a.portal_key));
  const visible=(catalog??[]).filter(p=>Boolean(owner)||allowed.has(p.key));
