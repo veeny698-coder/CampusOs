@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import {redirect} from 'next/navigation';
-import {createSupabaseServerClient} from '../../../lib/supabase/server';
+import {createSupabaseServerClient} from '../../lib/supabase/server';
 export const dynamic='force-dynamic';
 const icons:Record<string,string>={events:'✦',qr_scanner:'▣',certifrenzy:'◇'};
 export default async function PortalHub(){
