@@ -16,6 +16,7 @@ export default async function PortalManagement(){
  ]);
  const error=[portals,schools,events,organizations,members,assignments].some(x=>x.error);
  const names=new Map((schools.data??[]).map(i=>[i.id,i.name]));
+ const memberNames=new Map((members.data??[]).map(member=>[member.user_id,member.email]));
  return <main style={{padding:30,maxWidth:1100,margin:'auto'}}>
   <Link href="/admin/dashboard">← Command center</Link>
   <p className="eyebrow" style={{marginTop:20}}>CAMPUSOS / DYNAMIC PORTALS</p>
@@ -24,7 +25,7 @@ export default async function PortalManagement(){
   {error?<p role="alert">Portal data could not be loaded. No permissions have changed.</p>:<>
    <AssignmentForm institutions={schools.data??[]} events={events.data??[]} organizations={organizations.data??[]} users={members.data??[]} portals={portals.data??[]}/>
    <section style={{marginTop:35}}><h2>Available portals</h2><div style={{display:'grid',gap:12}}>{(portals.data??[]).map(p=><div key={p.key} style={{padding:16,border:'1px solid #34365b',borderRadius:12}}><strong>{p.label}</strong><p>{p.description}</p><Link href={p.route}>Open portal ↗</Link></div>)}</div></section>
-   <section style={{marginTop:30}}><h2>Current assignments</h2>{!assignments.data?.length?<p>No portal assignments yet.</p>:<div style={{display:'grid',gap:9}}>{assignments.data.map(a=><div key={a.id} style={{border:'1px solid #34365b',borderRadius:10,padding:14}}><strong>{a.portal_key}</strong> · {names.get(a.institution_id)??'Institution'} · {a.event_id?'Event: '+a.event_id:a.organization_id?'Organization: '+a.organization_id:'All events'}<p style={{fontSize:12,overflowWrap:'anywhere'}}>Member: {a.user_id}</p></div>)}</div>}</section>
+   <section style={{marginTop:30}}><h2>Current assignments</h2>{!assignments.data?.length?<p>No portal assignments yet.</p>:<div style={{display:'grid',gap:9}}>{assignments.data.map(a=><div key={a.id} style={{border:'1px solid #34365b',borderRadius:10,padding:14}}><strong>{a.portal_key}</strong> · {names.get(a.institution_id)??'Institution'} · {a.event_id?'Event: '+a.event_id:a.organization_id?'Organization: '+a.organization_id:'All events'}<p style={{fontSize:12,overflowWrap:'anywhere'}}>Member: {memberNames.get(a.user_id)??a.user_id}</p></div>)}</div>}</section>
   </>}
  </main>;
 }
