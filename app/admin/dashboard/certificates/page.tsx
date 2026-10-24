@@ -21,7 +21,7 @@ export default async function CertificatesPage(){
  const {data:coordinators,error:coordinatorError}=await access.client.from('certificate_coordinators').select('id,full_name,event_id,certificate_code,created_at').order('created_at',{ascending:false}).limit(100);
  const {data:issued,error:issuedError}=await access.client.from('event_certificates').select('id,recipient_name,certificate_type,certificate_code,issued_at').order('issued_at',{ascending:false}).limit(50);
  return <main className="console-directory" style={{maxWidth:1050,margin:'auto',padding:28}}>
-  <Link href="/admin/dashboard" className="console-text-link">← Dashboard</Link><div className="eyebrow" style={{marginTop:28}}>CERTIFICATES · Powered by CertiFrenzi</div>
+  <Link href="/admin/dashboard" className="console-text-link">← Dashboard</Link><div className="eyebrow" style={{marginTop:28}}>CERTIFICATES · Powered by CertiFrenzy</div>
   <h1 className="heading">Every achievement counts. ✦</h1>
   <p className="muted">Issue authentic, uniquely verifiable certificates for event participants.</p>
   <p><Link className="console-text-link" href="/admin/dashboard/certificates/feedback-responses">Review feedback responses & export CSV ↗</Link></p>
