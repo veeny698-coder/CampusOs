@@ -15,7 +15,7 @@ export default async function Coordinators({params}:{params:Promise<{id:string}>
  return <main style={{minHeight:'100vh',padding:24,display:'grid',placeItems:'center'}}>
  <section style={{padding:30,maxWidth:580,width:'100%',background:'#151b2f',border:'1px solid #34365b',borderRadius:20}}>
  <Link href="/">campusOS. ✦</Link><p className="eyebrow">CERTIFRENZY / COORDINATORS</p>
- <h1>Coordinator certificates</h1><h2>{data.title}</h2><p className="muted">Enter your name as registered by the event administrator.</p>
+ <h1>Coordinator certificates</h1><p style={{fontSize:12,color:"#b9a5ff"}}>Powered by CertiFrenzi</p><h2>{data.title}</h2><p className="muted">Enter your name as registered by the event administrator.</p>
  <CoordinatorLookup eventId={id}/>
  </section></main>;
 }
