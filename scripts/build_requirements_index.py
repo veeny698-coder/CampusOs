@@ -71,10 +71,23 @@ def extract(path, source):
 
 def save(filename, rows):
     OUT.mkdir(parents=True, exist_ok=True)
+    # Preserve human-reviewed progress when the source is re-extracted.
+    existing = {}
+    destination = OUT / filename
+    if destination.exists():
+        with destination.open(newline="", encoding="utf-8-sig") as prior:
+            for row in csv.DictReader(prior):
+                existing[row.get("requirement_id","")] = row
+    for row in rows:
+        old = existing.get(row["requirement_id"], {})
+        for key in ("status", "owner", "release", "code_path", "migration",
+                    "positive_test", "negative_test", "ui_parity", "approval", "notes"):
+            if old.get(key) and old[key] != "NOT_STARTED":
+                row[key] = old[key]
     columns = ["source","requirement_id","domain","source_block","block_type","source_excerpt",
                "status","owner","release","code_path","migration","positive_test",
                "negative_test","ui_parity","approval","notes"]
-    with (OUT/filename).open("w",newline="",encoding="utf-8-sig") as f:
+    with destination.open("w",newline="",encoding="utf-8-sig") as f:
         writer=csv.DictWriter(f,fieldnames=columns)
         writer.writeheader()
         writer.writerows(rows)
