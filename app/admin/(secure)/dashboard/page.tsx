@@ -38,14 +38,14 @@ export default async function SecureDashboard() {
   let institutions: { id: string; name: string; slug: string; created_at: string }[] | null = null;
   let listError = false;
   try {
-    const [countResult, listResult] = await within(Promise.all([
-      access.client.from('institutions').select('id', { count: 'exact', head: true }),
-      access.client.from('institutions').select('id,name,slug,created_at').order('created_at', { ascending: false }).limit(5),
-    ]));
-    institutionCount = countResult.count;
-    countError = Boolean(countResult.error);
-    institutions = listResult.data;
-    listError = Boolean(listResult.error);
+    // One scoped query returns both the live count and the first five institutions.
+    const result = await within(access.client.from('institutions')
+      .select('id,name,slug,created_at', {count: 'exact'})
+      .order('created_at', { ascending: false }).limit(5), 5000);
+    institutionCount = result.count;
+    countError = Boolean(result.error);
+    institutions = result.data;
+    listError = Boolean(result.error);
   } catch {
     countError = true;
     listError = true;
@@ -66,7 +66,7 @@ export default async function SecureDashboard() {
         <Link href="/admin/dashboard/security"><span>⚿</span> Security</Link>
       </nav>
       <div className="console-nav-label">COMING NEXT</div>
-      <div className="console-nav console-disabled" aria-label="Planned modules"><span>◉ &nbsp;Societies</span><span>✧ &nbsp;Festival automation</span><span>◇ &nbsp;Automation studio</span><span>▤ &nbsp;Certificates</span></div>
+      <div className="console-nav console-disabled" aria-label="Planned modules"><span>◉ &nbsp;Societies</span><span>✧ &nbsp;Festival automation</span><span>◇ &nbsp;Automation studio</span></div>
       <div className="console-sidebar-footer"><span className="console-avatar">{access.user.email?.slice(0,1).toUpperCase() || 'O'}</span><div><strong>Platform owner</strong><small title={access.user.email}>{access.user.email}</small></div></div>
     </aside>
     <main className="console-main">
