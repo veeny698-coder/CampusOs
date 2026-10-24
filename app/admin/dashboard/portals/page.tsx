@@ -16,7 +16,7 @@ export default async function PortalManagement(){
  ]);
  const error=[portals,schools,events,organizations,members,assignments].some(x=>x.error);
  const names=new Map((schools.data??[]).map(i=>[i.id,i.name]));
- const memberNames=new Map((members.data??[]).map(member=>[member.user_id,member.email]));
+ const memberNames=new Map((members.data??[]).map((member:{user_id:string;email:string})=>[member.user_id,member.email]));
  return <main style={{padding:30,maxWidth:1100,margin:'auto'}}>
   <Link href="/admin/dashboard">← Command center</Link>
   <p className="eyebrow" style={{marginTop:20}}>CAMPUSOS / DYNAMIC PORTALS</p>
