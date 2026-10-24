@@ -16,7 +16,7 @@ export default async function VerifyCertificate({params}:{params:Promise<{code:s
  return <main style={{minHeight:'100vh',padding:'50px 20px',background:'#0d1424',color:'white',display:'grid',placeItems:'center'}}>
   <article style={{maxWidth:840,width:'100%',textAlign:'center',padding:'min(7vw,64px) 24px',border:'3px double #a78bfa',borderRadius:12,background:'#151b2f'}}>
    <Link href="/" style={{color:'#b9a5ff'}}>campusOS. ✦</Link>
-   <p style={{letterSpacing:4,color:'#b9a5ff',marginTop:35}}>CERTIFRENZY</p>
+   <p style={{letterSpacing:2,color:'#b9a5ff',marginTop:35}}>Powered by CertiFrenzi</p>
    <h1 style={{fontSize:'clamp(2rem,6vw,3.5rem)'}}>Certificate of {record.certificate_type==='appreciation'?'Appreciation':'Participation'}</h1>
    <p>This certificate is proudly presented to</p>
    <h2 style={{fontSize:'clamp(2rem,6vw,3rem)',margin:'24px 0',color:'#f5e9bf'}}>{record.recipient_name}</h2>
