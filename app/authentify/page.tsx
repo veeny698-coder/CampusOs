@@ -24,7 +24,7 @@ export default async function Authentify({searchParams}:{searchParams:Promise<{i
  return <main style={{minHeight:'100vh',display:'grid',placeItems:'center',background:'#0d1424',color:'#fff',padding:24}}>
   <section style={{maxWidth:520,width:'100%',padding:32,border:'1px solid #34365b',borderRadius:20,background:'#151b2f'}}>
    <Link href="/" style={{color:'#b9a5ff'}}>campusOS. ✦</Link>
-   <p style={{fontSize:12,color:'#b9a5ff',marginTop:20}}>Powered by CertiFrenzi</p>
+   <p style={{fontSize:12,color:'#b9a5ff',marginTop:20}}>Powered by CertiFrenzy</p>
    <h1>Authentify Certificate</h1>
    <p>Enter the certificate ID printed on a participant or coordinator certificate to verify it.</p>
    {invalid&&<p role="alert" style={{color:'#fca5a5'}}>No verified certificate was found for that ID. Please check it and retry.</p>}
