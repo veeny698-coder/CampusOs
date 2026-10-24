@@ -10,7 +10,7 @@ export default async function LookupPage(){
  return <main style={{minHeight:'100vh',padding:24,display:'grid',placeItems:'center'}}>
   <section style={{width:'100%',maxWidth:600,border:'1px solid #34365b',borderRadius:18,background:'#151b2f',padding:30}}>
    <Link href="/">campusOS. ✦</Link><p className="eyebrow">CERTIFRENZY / PARTICIPANTS</p>
-   <h1>Find your certificate</h1><p style={{fontSize:12,color:"#b9a5ff"}}>Powered by CertiFrenzi</p>
+   <h1>Find your certificate</h1><p><Link href="/authentify" style={{color:"#b9a5ff"}}>Already have a Certificate ID? Verify it ↗</Link></p><p style={{fontSize:12,color:"#b9a5ff"}}>Powered by CertiFrenzi</p>
    <p className="muted">Look up your participation certificate with the exact name and email used during event registration. Feedback must have been completed.</p>
    {error?<p role="alert">Unable to load events.</p>:!data?.length?<p>No public events available yet.</p>:<CertificateLookup events={data}/>}
   </section>
