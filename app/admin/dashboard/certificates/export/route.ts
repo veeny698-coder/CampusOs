@@ -104,7 +104,7 @@ export async function GET(request:Request){
    (backgroundImage?'<image x="0" y="0" width="'+artWidth+'" height="'+artHeight+'" preserveAspectRatio="none" href="'+backgroundImage+'"/>':'')+
    heading+texts+
    '<rect x="'+(artWidth/2-Math.min(250,artWidth*0.45))+'" y="'+(artHeight-58)+'" width="'+Math.min(500,artWidth*0.9)+'" height="40" rx="6" fill="#0c1222" opacity="0.86"/>'+
-   '<text x="'+(artWidth/2)+'" y="'+(artHeight-31)+'" text-anchor="middle" font-size="23" font-family="Arial,sans-serif" font-weight="bold" fill="#ffffff">Powered by CertiFrenzi</text>'+
+   '<text x="'+(artWidth/2)+'" y="'+(artHeight-31)+'" text-anchor="middle" font-size="23" font-family="Arial,sans-serif" font-weight="bold" fill="#ffffff">Powered by CertiFrenzy</text>'+
    '<rect x="'+(qx-qrSize/2)+'" y="'+(qy-qrSize/2)+'" width="'+qrSize+'" height="'+qrSize+'" fill="#ffffff"/>'+
    '<image x="'+(qx-qrSize/2+7)+'" y="'+(qy-qrSize/2+7)+'" width="'+(qrSize-14)+'" height="'+(qrSize-14)+'" href="'+qr+'"/></svg>';
   const png=await sharp(Buffer.from(svg)).png().toBuffer();
