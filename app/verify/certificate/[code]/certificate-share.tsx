@@ -10,7 +10,7 @@ export default function CertificateShare({name,event,code,kind='participation',i
  const linkedIn=new URL('https://www.linkedin.com/profile/add');
  linkedIn.searchParams.set('startTask','CERTIFICATION_NAME');
  linkedIn.searchParams.set('name',title+' – '+event);
- linkedIn.searchParams.set('organizationName','CertiFrenzi');
+ linkedIn.searchParams.set('organizationName','CertiFrenzy');
  linkedIn.searchParams.set('certUrl',url);
  linkedIn.searchParams.set('certId',code);
  const issuedDate=new Date(issued);
@@ -29,7 +29,7 @@ export default function CertificateShare({name,event,code,kind='participation',i
   }catch{setMessage('Sharing was cancelled.');}
  }
  return <div style={{display:'grid',gap:10,justifyItems:'center',marginTop:20}}>
-  <p style={{fontSize:13,color:'#b9a5ff'}}>Powered by CertiFrenzi</p>
+  <p style={{fontSize:13,color:'#b9a5ff'}}>Powered by CertiFrenzy</p>
   <div style={{display:'flex',gap:10,flexWrap:'wrap',justifyContent:'center'}}>
    <button onClick={copy} style={{padding:10,border:'1px solid #a78bfa',borderRadius:8}}>Copy verification link</button>
    <button onClick={share} style={{padding:10,border:'1px solid #a78bfa',borderRadius:8}}>Share certificate</button>
