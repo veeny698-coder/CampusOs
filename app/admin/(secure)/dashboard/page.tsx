@@ -60,6 +60,7 @@ export default async function SecureDashboard() {
         <Link href="/admin/dashboard/institutions"><span>▦</span> Institutions</Link>
         <Link href="/admin/dashboard/audit"><span>☷</span> Audit trail</Link>
         <Link href="/admin/dashboard/events"><span>✧</span> Events</Link>
+        <Link href="/admin/dashboard/portals"><span>▦</span> Portal assignments</Link>
         <Link href="/admin/dashboard/check-in"><span>▣</span> QR Scanner</Link>
         <Link href="/admin/dashboard/certificates"><span>◇</span> Certificates</Link>
         <Link href="/admin/dashboard/security"><span>⚿</span> Security</Link>
