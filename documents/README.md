@@ -24,6 +24,7 @@
 - [Start Here / terminology](knowledge-base/00_START_HERE.md)
 - [Product Contract, scope and actor model](knowledge-base/PRODUCT_CONTRACT.md)
 - [System Architecture and shared event identity](knowledge-base/SYSTEM_ARCHITECTURE.md)
+- [Actual Supabase schema snapshot and non-destructive evolution](knowledge-base/LIVE_SCHEMA_AND_DATA_MODEL.md)
 - [Portal authorization and tenancy](knowledge-base/PORTAL_RBAC_AND_TENANCY.md)
 - [Original CertiFrenzi parity and data adapters](knowledge-base/CERTIFRENZY_PARITY.md)
 - [Verified original CertiFrenzi source files and API map](knowledge-base/ORIGINAL_SOURCE_FILE_MAP.md)
