@@ -26,6 +26,7 @@
 - [System Architecture and shared event identity](knowledge-base/SYSTEM_ARCHITECTURE.md)
 - [Portal authorization and tenancy](knowledge-base/PORTAL_RBAC_AND_TENANCY.md)
 - [Original CertiFrenzi parity and data adapters](knowledge-base/CERTIFRENZY_PARITY.md)
+- [Verified original CertiFrenzi source files and API map](knowledge-base/ORIGINAL_SOURCE_FILE_MAP.md)
 - [Traceability and document-ID pitfalls](knowledge-base/REQUIREMENTS_TRACEABILITY.md)
 - [Test matrix and production release gates](knowledge-base/TESTING_AND_RELEASE.md)
 - [Runtime environments and operations](knowledge-base/OPERATIONS_AND_ENVIRONMENTS.md)
