@@ -1,22 +1,37 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-
 export default function DashboardLoading() {
-  const [slow, setSlow] = useState(false);
-  useEffect(() => {
-    const timer = window.setTimeout(() => setSlow(true), 12000);
-    return () => window.clearTimeout(timer);
-  }, []);
-  return <main className="main" aria-busy={!slow} aria-live="polite">
-    <div className="eyebrow">Platform command center</div>
-    <h1 className="heading">Your campus universe.</h1>
-    {slow
-      ? <div role="alert">
-          <p className="muted">The dashboard is taking longer than expected. Your data is safe.</p>
-          <a className="console-text-link" href="/admin/dashboard">Retry loading ↗</a>
-          <p className="muted">If this continues, check your internet connection or try signing in again.</p>
+  return <div className="console-shell console-shell-loading" aria-busy="true" aria-live="polite">
+    <aside className="console-sidebar console-sidebar-loading" aria-hidden="true">
+      <div className="console-skeleton console-skeleton-logo" />
+      <div className="console-skeleton-label" />
+      <div className="console-skeleton-nav">
+        <span className="console-skeleton" />
+        <span className="console-skeleton" />
+        <span className="console-skeleton" />
+        <span className="console-skeleton" />
+        <span className="console-skeleton" />
+      </div>
+    </aside>
+    <main className="console-main">
+      <p className="sr-only" role="status">Loading the command center.</p>
+      <header className="console-header">
+        <div className="console-loading-copy">
+          <div className="console-skeleton console-skeleton-kicker" />
+          <div className="console-skeleton console-skeleton-title" />
+          <div className="console-skeleton console-skeleton-text" />
         </div>
-      : <p className="muted" role="status">Loading live dashboard data…</p>}
-  </main>;
+        <div className="console-skeleton console-skeleton-button" aria-hidden="true" />
+      </header>
+      <section className="console-skeleton console-skeleton-feature" aria-hidden="true" />
+      <section className="console-metrics" aria-hidden="true">
+        <div className="console-skeleton console-skeleton-stat" />
+        <div className="console-skeleton console-skeleton-stat" />
+        <div className="console-skeleton console-skeleton-stat" />
+      </section>
+      <section aria-hidden="true">
+        <div className="console-skeleton console-skeleton-section-title" />
+        <div className="console-skeleton console-skeleton-list" />
+      </section>
+    </main>
+  </div>;
 }
+
