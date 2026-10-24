@@ -11,7 +11,7 @@ export default async function PortalManagement(){
   owner.client.from('institutions').select('id,name').order('name').limit(100),
   owner.client.from('events').select('id,title,institution_id').order('created_at',{ascending:false}).limit(200),
   owner.client.from('organizations').select('id,name,institution_id').limit(200),
-  owner.client.from('institution_memberships').select('user_id,institution_id').limit(500),
+  owner.client.rpc('list_portal_members'),
   owner.client.from('portal_assignments').select('id,portal_key,institution_id,organization_id,event_id,user_id,created_at').order('created_at',{ascending:false}).limit(150)
  ]);
  const error=[portals,schools,events,organizations,members,assignments].some(x=>x.error);
