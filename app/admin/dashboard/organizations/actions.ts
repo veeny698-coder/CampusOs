@@ -16,6 +16,8 @@ export async function createOrganization(_prev:OrganizationState,form:FormData):
   const {error}=await access.client.rpc('create_campus_organization',{p_institution:institution,p_kind:kind,p_name:name});
   if(error)return {ok:false,message:error.code==='23505'?'This organization already exists in the college.':'Could not create organization. Check permissions.'};
   revalidatePath('/admin/dashboard/organizations');
+  revalidatePath('/super-admin/organizations');
+  revalidatePath(`/super-admin/institutions/${institution}`);
   return {ok:true,message:'Organization created and audit event saved.'};
  }catch{return {ok:false,message:'Organization service unavailable.'};}
 }
