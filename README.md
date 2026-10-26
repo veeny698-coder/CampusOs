@@ -6,7 +6,7 @@ Multi-tenant campus operations platform combining QRBlaze and CertiFrenzy.
 
 ## Architecture
 - Next.js TypeScript web application (`apps/web`)
-- Supabase Auth and PostgreSQL with tenant-scoped RLS (`supabase/migrations`)
+- Supabase Auth and PostgreSQL with tenant-scoped RLS (`supabase/migrhhations`)
 - Modular domain services; n8n orchestration added after authenticated tool APIs
 
 ## Security first
