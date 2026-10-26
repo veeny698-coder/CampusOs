@@ -1,0 +1,7 @@
+'use client';
+import {useActionState} from 'react';
+import {createFlag,publishSetting,type State} from './actions';
+const initial:State={ok:false,message:''};
+function Message({state}:{state:State}){return state.message?<p className={state.ok?'sa-form__success':'sa-form__error'} role="status">{state.message}</p>:null;}
+export function CreateFlagForm(){const[state,action,pending]=useActionState(createFlag,initial);return <form className="sa-form" action={action}><h2>Create feature flag</h2><div className="sa-form__grid"><label>Key<input name="key" required placeholder="new_feature" pattern="[a-z][a-z0-9_]*"/></label><label>Label<input name="label" required placeholder="New feature"/></label></div><label>Description<textarea name="description" maxLength={1000}/></label><label className="sa-check"><input name="default_enabled" value="yes" type="checkbox"/> Enabled by default</label><button disabled={pending}>{pending?'Creating…':'Create flag'}</button><Message state={state}/></form>}
+export function PublishSettingForm(){const[state,action,pending]=useActionState(publishSetting,initial);return <form className="sa-form" action={action}><h2>Publish platform setting</h2><label>Key<input name="key" required placeholder="support_contact"/></label><label>JSON value<textarea name="value" required defaultValue={'{}'}/></label><label>Reason<textarea name="reason" required minLength={3} maxLength={500}/></label><button disabled={pending}>{pending?'Publishing…':'Publish setting'}</button><Message state={state}/></form>}

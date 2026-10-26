@@ -29,7 +29,7 @@ const groups: NavigationGroup[] = [
     { label: 'Billing', href: '/super-admin/billing' }, { label: 'Usage', href: '/super-admin/billing/usage' },
   ] },
   { label: 'Modules & Configuration', icon: '◇', items: [
-    { label: 'Module Catalog', href: '/super-admin/modules' }, { label: 'Feature Flags', href: '/super-admin/modules/flags' }, { label: 'Global Settings', href: '/super-admin/settings' },
+    { label: 'Module Catalog', href: '/super-admin/modules', available: true }, { label: 'Feature Flags', href: '/super-admin/modules/flags', available: true }, { label: 'Global Settings', href: '/super-admin/settings', available: true },
   ] },
   { label: 'Automation & AI', icon: '✦', items: [
     { label: 'Automation Center', href: '/super-admin/automations' }, { label: 'AI Control Center', href: '/super-admin/ai' },
