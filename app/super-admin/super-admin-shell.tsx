@@ -23,7 +23,7 @@ const groups: NavigationGroup[] = [
   ] },
   { label: 'People & Access', icon: '◎', items: [
     { label: 'User Directory', href: '/super-admin/users' }, { label: 'Roles & Permissions', href: '/super-admin/access/roles' },
-    { label: 'Portal Access', href: '/super-admin/access/portals' }, { label: 'Platform Team', href: '/super-admin/team' }, { label: 'Invitations', href: '/super-admin/invitations' },
+    { label: 'Portal Access', href: '/super-admin/access/portals', available: true }, { label: 'Platform Team', href: '/super-admin/team' }, { label: 'Invitations', href: '/super-admin/invitations' },
   ] },
   { label: 'Subscriptions & Revenue', icon: '◒', items: [
     { label: 'Plans', href: '/super-admin/billing/plans' }, { label: 'Subscriptions', href: '/super-admin/billing/subscriptions' },
