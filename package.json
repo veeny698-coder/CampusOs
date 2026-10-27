@@ -6,26 +6,28 @@
     "dev": "next dev",
     "build": "next build",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/*.test.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.105.0",
+    "html5-qrcode": "^2.3.8",
+    "jszip": "3.10.1",
     "next": "^15.3.0",
+    "qrcode": "^1.5.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "qrcode": "^1.5.4",
-    "jszip": "3.10.1",
-    "sharp": "0.34.3",
-    "html5-qrcode": "^2.3.8"
+    "sharp": "0.34.3"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.12",
     "@types/node": "^22.0.0",
+    "@types/qrcode": "^1.5.5",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "typescript": "^5.8.0",
     "eslint": "^9.0.0",
     "eslint-config-next": "^15.3.0",
-    "@types/qrcode": "^1.5.5"
+    "typescript": "^5.8.0"
   }
 }
