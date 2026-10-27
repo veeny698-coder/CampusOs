@@ -20,4 +20,4 @@ export async function middleware(request: NextRequest) {
   await supabase.auth.getUser();
   return response;
 }
-export const config = { matcher: ['/admin/dashboard/:path*', '/super-admin/:path*', '/auth/callback'] };
+export const config = { matcher: ['/admin/dashboard/:path*', '/super-admin/:path*', '/auth/callback', '/auth/continue', '/portals'] };

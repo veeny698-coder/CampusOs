@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { signOut } from '../admin/dashboard/sign-out';
 import './super-admin.css';
+import './readability.css';
 
 type NavigationItem = { label: string; href: string; available?: boolean };
 type NavigationGroup = { label: string; icon: string; items: NavigationItem[] };
@@ -21,12 +22,12 @@ const groups: NavigationGroup[] = [
     { label: 'Onboarding', href: '/super-admin/onboarding', available: true }, { label: 'Organizations', href: '/super-admin/organizations', available: true },
   ] },
   { label: 'People & Access', icon: '◎', items: [
-    { label: 'User Directory', href: '/super-admin/users' }, { label: 'Roles & Permissions', href: '/super-admin/roles' },
-    { label: 'Portal Access', href: '/super-admin/access' }, { label: 'Platform Team', href: '/super-admin/team' }, { label: 'Invitations', href: '/super-admin/invitations' },
+    { label: 'User Directory', href: '/super-admin/users' }, { label: 'Roles & Permissions', href: '/super-admin/access/roles' },
+    { label: 'Portal Access', href: '/super-admin/access/portals' }, { label: 'Platform Team', href: '/super-admin/team' }, { label: 'Invitations', href: '/super-admin/invitations' },
   ] },
   { label: 'Subscriptions & Revenue', icon: '◒', items: [
     { label: 'Plans', href: '/super-admin/billing/plans' }, { label: 'Subscriptions', href: '/super-admin/billing/subscriptions' },
-    { label: 'Billing', href: '/super-admin/billing' }, { label: 'Usage', href: '/super-admin/billing/usage' },
+    { label: 'Contracts & Invoices', href: '/super-admin/billing/contracts' }, { label: 'Usage', href: '/super-admin/billing/usage' },
   ] },
   { label: 'Modules & Configuration', icon: '◇', items: [
     { label: 'Module Catalog', href: '/super-admin/modules', available: true }, { label: 'Feature Flags', href: '/super-admin/modules/flags', available: true }, { label: 'Global Settings', href: '/super-admin/settings', available: true },
@@ -39,14 +40,14 @@ const groups: NavigationGroup[] = [
     { label: 'System Health', href: '/super-admin/operations/health' }, { label: 'Jobs & Queues', href: '/super-admin/operations/jobs' }, { label: 'Storage & Resources', href: '/super-admin/operations/resources' },
   ] },
   { label: 'Trust & Security', icon: '◫', items: [
-    { label: 'Security Center', href: '/super-admin/security' }, { label: 'Audit Trail', href: '/super-admin/audit' }, { label: 'Data & Privacy', href: '/super-admin/privacy' },
+    { label: 'Security Center', href: '/super-admin/security' }, { label: 'Audit Trail', href: '/super-admin/audit', available: true }, { label: 'Data & Privacy', href: '/super-admin/privacy' },
   ] },
   { label: 'Support', icon: '?', items: [{ label: 'Support Tickets', href: '/super-admin/support' }, { label: 'Support Access', href: '/super-admin/support/access' }] },
   { label: 'Platform Administration', icon: '⚙', items: [{ label: 'Release Management', href: '/super-admin/releases' }] },
 ];
 
 function Sidebar({ email, onNavigate }: { email: string; onNavigate: () => void }) {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? '/super-admin';
   const [expanded, setExpanded] = useState('Command Center');
   const [collapsed, setCollapsed] = useState(false);
   const activeGroup = groups.find(group => group.items.some(item => pathname === item.href || (item.href !== '/super-admin' && pathname.startsWith(item.href))))?.label;
@@ -70,7 +71,7 @@ function Sidebar({ email, onNavigate }: { email: string; onNavigate: () => void 
           </button>
           {open && !collapsed && <div className="sa-nav__items">
             {group.items.map(item => item.available
-              ? <Link key={item.href} className={pathname === item.href ? 'is-current' : ''} href={item.href} onClick={onNavigate}>{item.label}</Link>
+              ? <Link key={item.href} aria-current={pathname === item.href ? 'page' : undefined} className={pathname === item.href ? 'is-current' : ''} href={item.href} onClick={onNavigate}>{item.label}</Link>
               : <span key={item.href} title="Scheduled for a later delivery phase">{item.label}</span>)}
           </div>}
         </section>;
@@ -103,6 +104,7 @@ export function SuperAdminShell({ email, children }: { email: string; children: 
   }, [drawerOpen]);
 
   return <div className="sa-shell">
+    <a className="sa-skip-link" href="#super-admin-content">Skip to content</a>
     <div className="sa-desktop-sidebar"><Sidebar email={email} onNavigate={() => undefined} /></div>
     <div className={`sa-drawer ${drawerOpen ? 'is-open' : ''}`} ref={drawer} aria-hidden={!drawerOpen}>
       <div className="sa-drawer__panel"><Sidebar email={email} onNavigate={() => setDrawerOpen(false)} /></div>
@@ -112,9 +114,9 @@ export function SuperAdminShell({ email, children }: { email: string; children: 
       <header className="sa-topbar">
         <button className="sa-menu" type="button" aria-label="Open navigation" onClick={() => setDrawerOpen(true)}>☰</button>
         <div className="sa-breadcrumb"><span>CampusOS</span><span aria-hidden="true">/</span><strong>Super Admin</strong></div>
-        <div className="sa-topbar__actions"><span className="sa-search-note">Permission-scoped search arrives with People & Access.</span><form action={signOut}><button className="sa-signout" type="submit">Sign out</button></form></div>
+        <div className="sa-topbar__actions"><Link className="sa-text-link" href="/portals">My portals</Link><form action={signOut}><button className="sa-signout" type="submit">Sign out</button></form></div>
       </header>
-      <main className="sa-content">{children}</main>
+      <main className="sa-content" id="super-admin-content" tabIndex={-1}>{children}</main>
     </div>
   </div>;
 }

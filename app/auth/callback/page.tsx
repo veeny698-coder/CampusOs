@@ -45,7 +45,7 @@ export default function AuthCallback() {
         const { data: { user }, error } = await client.auth.getUser();
         if (error || !user) throw new Error('no-session');
         window.history.replaceState(null, '', '/auth/callback');
-        window.location.replace('/admin/dashboard');
+        window.location.replace('/auth/continue');
       } catch (error) {
         if (!active) return;
         const reason = error instanceof Error && error.message === 'config' ? 'config' : 'auth-failed';

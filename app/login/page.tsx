@@ -31,7 +31,7 @@ export default function Login() {
       if (mode === 'password') {
         const { error } = await client.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        router.replace('/admin/dashboard'); router.refresh();
+        router.replace('/auth/continue'); router.refresh();
       } else {
         const { error } = await client.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin + '/auth/callback' } });
         if (error) throw error;
@@ -53,7 +53,7 @@ export default function Login() {
       const passkeyClient = createBrowserClient(url, key, { auth: { experimental: { passkey: true } } });
       const { error } = await passkeyClient.auth.signInWithPasskey();
       if (error) throw error;
-      window.location.assign('/admin/dashboard');
+      window.location.assign('/auth/continue');
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Passkey sign-in failed. Use email link instead.');
     } finally { setBusy(false); }
