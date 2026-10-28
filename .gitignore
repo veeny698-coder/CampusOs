@@ -10,3 +10,4 @@ coverage/
 *.key
 
 .netlify/
+supabase/.temp/

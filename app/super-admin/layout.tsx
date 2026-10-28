@@ -1,18 +1,18 @@
 import type { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '../../lib/supabase/server';
-import { getVerifiedPlatformOwner } from '../../lib/auth/platform-owner';
+import { getVerifiedPlatformAccess } from '../../lib/auth/platform-access';
 import { SuperAdminShell } from './super-admin-shell';
 
 export const dynamic = 'force-dynamic';
 
 /**
  * Platform control-plane access is deliberately separate from institution
- * membership. This layout is the single server-side authorization boundary
- * for every /super-admin route added in the delivery plan.
+ * membership. Every page, action and RPC independently checks its capability;
+ * this layout only gates entry into the platform workspace.
  */
 export default async function SuperAdminLayout({ children }: { children: ReactNode }) {
-  const access = await getVerifiedPlatformOwner();
+  const access = await getVerifiedPlatformAccess();
 
   if (!access) {
     const client = await createSupabaseServerClient();
@@ -20,5 +20,5 @@ export default async function SuperAdminLayout({ children }: { children: ReactNo
     redirect(user ? '/portals' : '/login');
   }
 
-  return <SuperAdminShell email={access.user.email ?? 'Platform owner'}>{children}</SuperAdminShell>;
+  return <SuperAdminShell email={access.user.email ?? 'Platform account'} isOwner={access.isOwner}>{children}</SuperAdminShell>;
 }

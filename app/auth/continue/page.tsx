@@ -15,5 +15,8 @@ export default async function ContinueSignIn() {
     <p>Your sign-in succeeded, but we could not check your access. Please try again.</p>
     <a href="/auth/continue">Retry access check</a>
   </main>;
-  redirect(owner ? '/super-admin' : '/portals');
+  if(owner)redirect('/super-admin');
+  const capabilities=await client.rpc('platform_my_capabilities');
+  if(!capabilities.error&&Array.isArray(capabilities.data)&&capabilities.data.includes('audit.read'))redirect('/super-admin/audit');
+  redirect('/portals');
 }

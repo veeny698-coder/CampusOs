@@ -22,8 +22,8 @@ const groups: NavigationGroup[] = [
     { label: 'Onboarding', href: '/super-admin/onboarding', available: true }, { label: 'Organizations', href: '/super-admin/organizations', available: true },
   ] },
   { label: 'People & Access', icon: '◎', items: [
-    { label: 'User Directory', href: '/super-admin/users' }, { label: 'Roles & Permissions', href: '/super-admin/access/roles' },
-    { label: 'Portal Access', href: '/super-admin/access/portals', available: true }, { label: 'Platform Team', href: '/super-admin/team' }, { label: 'Invitations', href: '/super-admin/invitations' },
+    { label: 'User Directory', href: '/super-admin/users' }, { label: 'Roles & Permissions', href: '/super-admin/access/roles', available: true },
+    { label: 'Portal Access', href: '/super-admin/access/portals', available: true }, { label: 'Platform Team', href: '/super-admin/team', available: true }, { label: 'Invitations', href: '/super-admin/invitations' },
   ] },
   { label: 'Subscriptions & Revenue', icon: '◒', items: [
     { label: 'Plans', href: '/super-admin/billing/plans', available: true }, { label: 'Subscriptions', href: '/super-admin/billing/subscriptions', available: true },
@@ -46,11 +46,12 @@ const groups: NavigationGroup[] = [
   { label: 'Platform Administration', icon: '⚙', items: [{ label: 'Release Management', href: '/super-admin/releases' }] },
 ];
 
-function Sidebar({ email, onNavigate }: { email: string; onNavigate: () => void }) {
+function Sidebar({ email, onNavigate, isOwner }: { email: string; onNavigate: () => void; isOwner:boolean }) {
+  const visibleGroups=isOwner?groups:groups.map(group=>({...group,items:group.items.filter(item=>item.href==='/super-admin/audit')})).filter(group=>group.items.length);
   const pathname = usePathname() ?? '/super-admin';
-  const [expanded, setExpanded] = useState('Command Center');
-  const [collapsed, setCollapsed] = useState(false);
   const activeGroup = groups.find(group => group.items.some(item => pathname === item.href || (item.href !== '/super-admin' && pathname.startsWith(item.href))))?.label;
+  const [expanded, setExpanded] = useState(activeGroup ?? visibleGroups[0]?.label ?? 'Command Center');
+  const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => { if (activeGroup) setExpanded(activeGroup); }, [activeGroup]);
 
@@ -62,7 +63,7 @@ function Sidebar({ email, onNavigate }: { email: string; onNavigate: () => void 
       </button>
     </div>
     <nav className="sa-nav">
-      {groups.map(group => {
+      {visibleGroups.map(group => {
         const open = expanded === group.label;
         const active = activeGroup === group.label;
         return <section className="sa-nav__group" key={group.label}>
@@ -77,11 +78,11 @@ function Sidebar({ email, onNavigate }: { email: string; onNavigate: () => void 
         </section>;
       })}
     </nav>
-    <div className="sa-sidebar__footer"><span className="sa-avatar">{email.slice(0, 1).toUpperCase()}</span><div className="sa-user"><strong>Platform owner</strong><small title={email}>{email}</small></div></div>
+    <div className="sa-sidebar__footer"><span className="sa-avatar">{email.slice(0, 1).toUpperCase()}</span><div className="sa-user"><strong>{isOwner?'Platform owner':'Audit operator'}</strong><small title={email}>{email}</small></div></div>
   </aside>;
 }
 
-export function SuperAdminShell({ email, children }: { email: string; children: ReactNode }) {
+export function SuperAdminShell({ email, children, isOwner }: { email: string; children: ReactNode;isOwner:boolean }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawer = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -105,9 +106,9 @@ export function SuperAdminShell({ email, children }: { email: string; children: 
 
   return <div className="sa-shell">
     <a className="sa-skip-link" href="#super-admin-content">Skip to content</a>
-    <div className="sa-desktop-sidebar"><Sidebar email={email} onNavigate={() => undefined} /></div>
+    <div className="sa-desktop-sidebar"><Sidebar email={email} isOwner={isOwner} onNavigate={() => undefined} /></div>
     <div className={`sa-drawer ${drawerOpen ? 'is-open' : ''}`} ref={drawer} aria-hidden={!drawerOpen}>
-      <div className="sa-drawer__panel"><Sidebar email={email} onNavigate={() => setDrawerOpen(false)} /></div>
+      <div className="sa-drawer__panel"><Sidebar email={email} isOwner={isOwner} onNavigate={() => setDrawerOpen(false)} /></div>
       <button className="sa-drawer__backdrop" type="button" aria-label="Close navigation" tabIndex={drawerOpen ? 0 : -1} onClick={() => setDrawerOpen(false)} />
     </div>
     <div className="sa-workspace">

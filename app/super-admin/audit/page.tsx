@@ -1,12 +1,12 @@
 import Link from 'next/link';
-import { getVerifiedPlatformOwner } from '../../../lib/auth/platform-owner';
+import { getVerifiedPlatformAccess } from '../../../lib/auth/platform-access';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AuditPage({ searchParams }: {
   searchParams: Promise<{ before?: string; action?: string }>;
 }) {
-  const access = await getVerifiedPlatformOwner();
+  const access = await getVerifiedPlatformAccess();
   if (!access) return null;
   const params = await searchParams;
   const before = params.before && /^[1-9][0-9]{0,17}$/.test(params.before) ? params.before : undefined;
@@ -16,7 +16,7 @@ export default async function AuditPage({ searchParams }: {
     .order('id', { ascending: false }).limit(51);
   if (before) query = query.lt('id', before);
   if (action) query = query.eq('action', action);
-  const { data, error } = await query;
+  const { data, error } = access.isOwner ? await query : await access.client.rpc('platform_audit_feed',{p_before:before??null,p_action:action||null});
   const rows = data?.slice(0, 50) ?? [];
   const next = new URLSearchParams();
   if (action) next.set('action', action);
@@ -31,7 +31,7 @@ export default async function AuditPage({ searchParams }: {
       {error ? <p className="sa-error" role="alert">Audit records could not be loaded. <Link href="/super-admin/audit">Retry</Link></p>
         : !rows.length ? <p className="sa-empty">No activity matches this filter.</p>
           : <div className="sa-table-wrap"><table className="sa-table"><thead><tr><th scope="col">Action</th><th scope="col">Resource</th><th scope="col">Recorded</th></tr></thead>
-            <tbody>{rows.map(row => <tr key={row.id}><td><strong>{row.action}</strong><small>Record {row.id}</small></td><td>{row.resource_type}<small>{row.resource_id ?? 'Platform'}</small></td><td><time dateTime={row.created_at}>{new Date(row.created_at).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST</time></td></tr>)}</tbody></table></div>}
+            <tbody>{rows.map((row:{id:string;action:string;resource_type:string;resource_id:string|null;created_at:string}) => <tr key={row.id}><td><strong>{row.action}</strong><small>Record {row.id}</small></td><td>{row.resource_type}<small>{row.resource_id ?? 'Platform'}</small></td><td><time dateTime={row.created_at}>{new Date(row.created_at).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST</time></td></tr>)}</tbody></table></div>}
       {!error && data && data.length > 50 && <p className="sa-empty"><Link className="sa-text-link" href={`/super-admin/audit?${next}`}>Older activity</Link></p>}
     </section>
   </>;

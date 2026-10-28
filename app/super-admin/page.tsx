@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import {redirect} from 'next/navigation';
+import {getVerifiedPlatformAccess} from '../../lib/auth/platform-access';
 import { getVerifiedPlatformOwner } from '../../lib/auth/platform-owner';
 
 export const dynamic = 'force-dynamic';
@@ -8,7 +10,11 @@ type AuditEntry = { id: string; action: string; resource_type: string; created_a
 
 export default async function SuperAdminOverview() {
   const access = await getVerifiedPlatformOwner();
-  if (!access) return null; // The parent layout redirects before this page can render.
+  if (!access) {
+    const operator=await getVerifiedPlatformAccess();
+    if(operator?.capabilities.includes('audit.read'))redirect('/super-admin/audit');
+    return null;
+  }
 
   const [institutionsResult, auditResult] = await Promise.all([
     access.client.from('institutions').select('id,name,slug,created_at', { count: 'exact' }).order('created_at', { ascending: false }).limit(5),

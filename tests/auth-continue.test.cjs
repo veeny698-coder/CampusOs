@@ -9,10 +9,11 @@ const compiled = ts.transpileModule(source, { compilerOptions: {
   module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX,
 } }).outputText;
 
-function fixture({ user = null, authError = null, owner = null, dbError = null } = {}) {
+function fixture({ user = null, authError = null, owner = null, dbError = null, capabilities=[] } = {}) {
   const calls = [];
   const client = {
     auth: { getUser: async () => ({ data: { user }, error: authError }) },
+    rpc:async()=>({data:capabilities,error:null}),
     from(table) {
       calls.push(table);
       return { select(columns) {
@@ -46,6 +47,10 @@ test('verified platform owner reaches Super Admin', async () => {
 test('tenant user reaches portals despite editable owner metadata', async () => {
   const f = fixture({ user: { id: 'tenant', user_metadata: { role: 'platform_owner' } } });
   await assert.rejects(f.run, /redirect:\/portals/);
+});
+test('verified audit operator reaches only the audit workspace',async()=>{
+  const f=fixture({user:{id:'operator'},capabilities:['audit.read']});
+  await assert.rejects(f.run,/redirect:\/super-admin\/audit/);
 });
 test('auth verification error denies even a returned user object', async () => {
   const f = fixture({ user: { id: 'owner' }, authError: { message: 'invalid' } });
