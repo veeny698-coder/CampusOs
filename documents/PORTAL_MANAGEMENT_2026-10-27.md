@@ -1,4 +1,4 @@
-# Portal management slice â€” approved migration applied
+# Portal management slice — approved migration applied
 
 Source: Ultimate Super Admin specification, People & Access / Portal Access; repository PRT-001 and portal membership/time-window requirements.
 
