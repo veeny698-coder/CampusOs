@@ -1,4 +1,4 @@
-# Portal management slice — pending production approval
+# Portal management slice â€” approved migration applied
 
 Source: Ultimate Super Admin specification, People & Access / Portal Access; repository PRT-001 and portal membership/time-window requirements.
 
@@ -11,7 +11,9 @@ Source: Ultimate Super Admin specification, People & Access / Portal Access; rep
 
 ## Live comparison and compatibility
 
-Live inspection on 27 October found the readiness function absent. This migration is **not applied**. The approved membership repair is recorded live as `20261027162046_restore_portal_membership_checks`, corresponding to repository `202610270001_restore_portal_membership_checks.sql`. Do not blindly push the local migration directory: it also contains an unapproved commercial draft and differing historical migration versions.
+Live inspection on 27 October found the readiness function absent. Following explicit owner approval, this migration was applied on 28 October and recorded as `20261028120600_portal_management`. Post-apply verification found the readiness function present, management SECURITY DEFINER with empty search_path, anonymous EXECUTE denied and authenticated EXECUTE allowed. Assignment count remained 0 and audit count remained 1; the migration changed no tenant records. GitHub CI run 40545649587 succeeded for implementation commit c3ddc79.
+
+The approved membership repair is recorded live as `20261027162046_restore_portal_membership_checks`, corresponding to repository `202610270001_restore_portal_membership_checks.sql`. Do not blindly push the local migration directory: it also contains an unapproved commercial draft and differing historical migration versions.
 
 The existing RPC signature and assignment IDs are preserved. UI mutation controls stay unavailable without the new readiness function; existing records can be inspected. No payment/provider, contract, commercial or deployment changes occur in this slice.
 
