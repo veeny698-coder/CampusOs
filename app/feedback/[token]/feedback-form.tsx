@@ -39,7 +39,7 @@ export default function FeedbackForm({token,alreadySubmitted,questions,open}:{to
   </label>)}
   <button disabled={busy} style={{padding:13,borderRadius:10,background:'#a78bfa',color:'#151b2f',fontWeight:700}}>{busy?'Submitting…':'Submit feedback & get certificate'}</button>
  </form>}
- {!open&&<p role="status">This event's feedback form is closed.</p>}
+ {!open&&<p role="status">This event&apos;s feedback form is closed.</p>}
  {(alreadySubmitted||certificate)&&<button type="button" disabled={busy} onClick={retryClaim} style={{padding:12,borderRadius:10}}>Find my submitted certificate</button>}
  <p role="status" aria-live="polite">{message}</p>
  {certificate&&<a href={'/verify/certificate/'+certificate} style={{color:'#b9a5ff',fontWeight:700}}>Open and download my certificate ↗</a>}

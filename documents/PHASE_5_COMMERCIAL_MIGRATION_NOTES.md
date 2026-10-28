@@ -1,12 +1,12 @@
 # Commercial foundation migration review
 
-28 October 2026. Status: consolidated additive batch; NOT APPLIED to production.
+28 October 2026. Status: owner-approved consolidated batch APPLIED and metadata verified.
 
 ## Source and scope
 
 Ultimate Super Admin specification section 04 (plans, subscriptions, contracts/billing and usage); SRS:TEN-003 through TEN-010, TEN-016, DATA-005, NFR-022, NFR-025; PRD:SAS-009 / PRT-001. This delivers provider-neutral reference records and entitlement operations. It does not claim the full commercial specification or full Super Admin is verified.
 
-One batch: `supabase/migrations/202610260005_commercial_foundation.sql`. The earlier uncommitted draft has been replaced in place; do not apply any earlier copy. Live read-only inspection on 28 October found no `commercial_%` tables. A preflight check refuses to overwrite an existing commercial schema.
+One batch: `supabase/migrations/202610260005_commercial_foundation.sql`, implementation commit `19941d5`. The earlier uncommitted draft was replaced in place; do not apply any earlier copy. Live read-only inspection on 28 October found no commercial tables. After explicit approval, the exact committed batch was applied and recorded live as `20261028182835_commercial_foundation`. All ten tables have RLS. Verification assertions passed: anonymous function access and direct authenticated table writes are denied. Existing counts remained unchanged: 1 institution, 0 events, 3 owners, 1 audit record. Plans and metering events remain empty; no commercial fixtures were seeded. A preflight check refuses accidental reapplication.
 
 ## Data and authorization
 
@@ -38,4 +38,4 @@ Before approval: review the entire batch, execute tests/typecheck/build, record 
 
 The SQL batch is transactional: a failed statement rolls back all its changes. After successful use, preserve all financial/history rows. Roll back the application entry points first and revoke authenticated EXECUTE on the new commercial mutation functions; do not delete tables/history or restore permissive policies. Revoking every commercial function also disables entitlement checks and must be coordinated with any later domain rollout. No destructive rollback is authorized by this review.
 
-Vercel automatic deployment remains disabled. No production commercial migration or deployment has been performed.
+GitHub CI run 40688713732 passed for implementation commit 19941d5. Vercel automatic deployment remains disabled. The commercial schema is applied; application deployment and hosted acceptance testing have not been performed.

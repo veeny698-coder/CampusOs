@@ -2,7 +2,7 @@
 
 Scope: Ultimate Super Admin sections 03.2 Roles, 03.4 Team and 08.2 Audit; SRS:IAM/ACL. This slice implements one working read-only capability, `audit.read`. It does not claim the complete platform role catalog, invitation delivery or tenant role system.
 
-Migration `20261028123732_platform_operator_audit_access.sql` was generated with Supabase CLI 2.122.0. Live metadata inspection found only platform_owners and platform_settings_versions; neither new table/function existed. The migration is NOT APPLIED.
+Migration `20261028123732_platform_operator_audit_access.sql` was generated with Supabase CLI 2.122.0. Live metadata inspection found only platform_owners and platform_settings_versions; neither new table/function existed. Following separate explicit owner approval, the exact migration from commit fa3d331 was applied on 29 October IST and recorded as `20261028183125_platform_operator_audit_access` (UTC version). Both new tables have RLS, no related function is anonymous-executable, and unauthenticated capability lookup returns an empty array. Counts remain 3 owners, 1 institution and 1 audit record; roles and requests are empty. GitHub CI run 40690636943 passed.
 
 ## Behavior and security
 

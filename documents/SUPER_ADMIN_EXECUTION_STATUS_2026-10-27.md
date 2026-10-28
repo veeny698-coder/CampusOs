@@ -26,7 +26,7 @@ Update 28 October: commercial foundation pages/actions and the consolidated addi
 ## Open work and release gates
 
 - Authenticated browser login/logout, session expiry, owner/member boundaries, mobile screenshots, keyboard interaction, and product-owner visual review remain pending.
-- Phase 5 remains unapplied. Composite tenant FKs, immutable published entitlements, reference contracts/billing, atomic idempotent metering and tested RPC/UI operations are now implemented. Provider/financial/legal integration, granular commercial operators, domain metering adapters and authenticated hosted acceptance remain open; see the migration notes rather than treating foundation delivery as full commercial completion.
+- Phase 5 foundation was separately approved and applied as live version 20261028182835. Composite tenant FKs, immutable published entitlements, reference contracts/billing, atomic idempotent metering and tested RPC/UI operations are implemented. Provider/financial/legal integration, granular commercial operators, domain metering adapters and authenticated hosted acceptance remain open; see the migration notes rather than treating foundation delivery as full commercial completion.
 - Operator capability roles, actual invitation delivery/acceptance, support approvals, privacy policies, integrations, telemetry, incident and queue adapters, AI approvals, and release controls are not implemented by this slice.
 - Financial provider, legal wording, currency and tax decisions remain open. These must not be fabricated to fill screens.
 - CertiFrenzy ZIP route inventory was inspected without copying Firebase credentials. Its exact UI transplant and shared database adapters are pending after Super Admin priority work.
