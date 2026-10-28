@@ -3,9 +3,9 @@
 import { revalidatePath } from 'next/cache';
 import { getVerifiedPlatformOwner } from '../../../lib/auth/platform-owner';
 
-export type ActionState = { ok: boolean; message: string; id?: string };
+export type ActionState = { ok: boolean; message: string; id?: string; invitationLink?: string };
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const refresh = (id?: string) => { revalidatePath('/super-admin'); revalidatePath('/super-admin/institutions'); revalidatePath('/super-admin/onboarding'); if (id) revalidatePath(`/super-admin/institutions/${id}`); };
+const refresh = (id?: string) => { revalidatePath('/super-admin'); revalidatePath('/super-admin/institutions'); revalidatePath('/super-admin/onboarding'); revalidatePath('/super-admin/invitations'); if (id) revalidatePath(`/super-admin/institutions/${id}`); };
 
 export async function createSuperAdminInstitution(_: ActionState, form: FormData): Promise<ActionState> {
   const name = String(form.get('name') ?? '').trim();
@@ -38,12 +38,23 @@ export async function changeInstitutionLifecycle(_: ActionState, form: FormData)
 }
 
 export async function createOwnerInvitation(_: ActionState, form: FormData): Promise<ActionState> {
-  const id = String(form.get('institution') ?? ''); const email = String(form.get('email') ?? '').trim().toLowerCase(); const expiresAt = String(form.get('expires_at') ?? '');
-  if (!uuid.test(id) || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || !expiresAt) return { ok: false, message: 'Enter a valid email and expiry.' };
+  const id = String(form.get('institution') ?? ''); const email = String(form.get('email') ?? '').trim().toLowerCase(); const expiresAt = String(form.get('expires_at') ?? ''); const reason = String(form.get('reason') ?? '').trim();
+  const expiry = new Date(expiresAt);
+  if (!uuid.test(id) || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || !expiresAt || Number.isNaN(expiry.valueOf()) || expiry.valueOf() <= Date.now() || reason.length < 3 || reason.length > 500) return { ok: false, message: 'Enter a valid email, future expiry and a 3-500 character reason.' };
   const access = await getVerifiedPlatformOwner(); if (!access) return { ok: false, message: 'Platform-owner authorization is required.' };
-  const { error } = await access.client.rpc('create_institution_owner_invitation', { p_institution: id, p_email: email, p_expires_at: new Date(expiresAt).toISOString() });
-  if (error) return { ok: false, message: error.code === '23505' ? 'A pending invitation already exists for this address.' : 'Invitation request could not be created.' };
-  refresh(id); return { ok: true, message: 'Invitation request recorded and audited. Email delivery is not configured in this phase.' };
+  const { data, error } = await access.client.rpc('create_owner_invitation_link', { p_institution: id, p_email: email, p_expires_at: expiry.toISOString(), p_reason: reason });
+  const item = Array.isArray(data) ? data[0] : data;
+  if (error || !item?.token) return { ok: false, message: error?.code === '23505' ? 'A pending invitation already exists for this address.' : 'Invitation link could not be created.' };
+  refresh(id); return { ok: true, message: 'One-time invitation link created and audited. Deliver it only through an approved channel.', invitationLink: `/owner-invitations/accept?token=${item.token}` };
+}
+
+export async function revokeOwnerInvitation(_: ActionState, form: FormData): Promise<ActionState> {
+  const invitation = String(form.get('invitation') ?? ''); const institution = String(form.get('institution') ?? ''); const reason = String(form.get('reason') ?? '').trim();
+  if (!uuid.test(invitation) || !uuid.test(institution) || reason.length < 3 || reason.length > 500) return { ok: false, message: 'Enter a valid revocation reason of 3-500 characters.' };
+  const access = await getVerifiedPlatformOwner(); if (!access) return { ok: false, message: 'Platform-owner authorization is required.' };
+  const { error } = await access.client.rpc('revoke_owner_invitation_link', { p_invitation: invitation, p_reason: reason });
+  if (error) return { ok: false, message: 'Invitation could not be revoked. It may already be accepted, revoked or unavailable.' };
+  refresh(institution); return { ok: true, message: 'Invitation link revoked and audit entry recorded.' };
 }
 
 export async function setOnboardingStage(_: ActionState, form: FormData): Promise<ActionState> {
