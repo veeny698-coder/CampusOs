@@ -4,7 +4,7 @@ Scope: SRS:IAM-002; implementation-plan Sprint 1 invitation and verified-email a
 
 ## Batch
 
-`supabase/migrations/20261028183937_owner_invitation_acceptance.sql` is the single additive migration for this slice and is **not applied to the live project** as of 29 October 2026.
+`supabase/migrations/20261028183937_owner_invitation_acceptance.sql` is the single additive migration for this slice. It was applied to the live project on 29 October 2026 as Supabase migration version `20261028193612`.
 
 It adds:
 
@@ -34,4 +34,4 @@ Before any rollback, revoke every outstanding link through the UI/RPC. To revers
 - Server-action test: `tests/owner-invitation-actions.test.cjs` covers input validation, owner authorization, allowlisted RPC arguments, relative link output, and generic acceptance failures.
 - Release SQL: `supabase/tests/owner_invitation_acceptance_verification.sql` verifies RLS, RPC grants, and added columns without creating records.
 
-Do not apply to production until this migration, the verification SQL, RLS checks, hosted authenticated browser flow, and product-owner visual review are approved together.
+Production schema verification has passed. Hosted authenticated browser acceptance and product-owner visual review remain required before marking the requirement VERIFIED.
