@@ -26,8 +26,8 @@ const groups: NavigationGroup[] = [
     { label: 'Portal Access', href: '/super-admin/access/portals', available: true }, { label: 'Platform Team', href: '/super-admin/team' }, { label: 'Invitations', href: '/super-admin/invitations' },
   ] },
   { label: 'Subscriptions & Revenue', icon: '◒', items: [
-    { label: 'Plans', href: '/super-admin/billing/plans' }, { label: 'Subscriptions', href: '/super-admin/billing/subscriptions' },
-    { label: 'Contracts & Invoices', href: '/super-admin/billing/contracts' }, { label: 'Usage', href: '/super-admin/billing/usage' },
+    { label: 'Plans', href: '/super-admin/billing/plans', available: true }, { label: 'Subscriptions', href: '/super-admin/billing/subscriptions', available: true },
+    { label: 'Contracts & Invoices', href: '/super-admin/billing/contracts', available: true }, { label: 'Usage', href: '/super-admin/billing/usage', available: true },
   ] },
   { label: 'Modules & Configuration', icon: '◇', items: [
     { label: 'Module Catalog', href: '/super-admin/modules', available: true }, { label: 'Feature Flags', href: '/super-admin/modules/flags', available: true }, { label: 'Global Settings', href: '/super-admin/settings', available: true },

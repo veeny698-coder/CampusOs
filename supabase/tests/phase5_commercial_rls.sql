@@ -1,0 +1,6 @@
+-- Behavioral tests are executable, not a scenario checklist:
+-- node --test tests/commercial-security.test.cjs
+-- They create a disposable PostgreSQL database, load the migration, exercise
+-- authenticated/anonymous RLS and RPCs, then close the isolated database.
+-- Do not load those fixtures into production.
+-- Production-safe metadata/rollup checks: phase5_commercial_verification.sql.

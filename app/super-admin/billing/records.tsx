@@ -1,0 +1,4 @@
+export function CommercialUnavailable(){return <p className="sa-error" role="alert">Commercial records could not be loaded. The reviewed commercial migration must be installed before these workflows can be used. Refresh to retry.</p>;}
+export function Records({title,rows,columns}:{title:string;rows:Record<string,unknown>[];columns:string[]}){
+ return <section className="sa-panel"><h2>{title}</h2><p className="sa-empty">Showing up to 1,000 latest records.</p>{!rows.length?<p className="sa-empty">No records yet.</p>:<div className="sa-table-wrap"><table className="sa-table"><thead><tr>{columns.map(column=><th scope="col" key={column}>{column.replaceAll('_',' ')}</th>)}</tr></thead><tbody>{rows.map((row,index)=><tr key={String(row.id??index)}>{columns.map(column=><td key={column}>{row[column]===null||row[column]===undefined?'—':String(row[column])}</td>)}</tr>)}</tbody></table></div>}</section>;
+}
